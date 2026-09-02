@@ -3,922 +3,950 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Afras Order Ledger</title>
-  <meta name="theme-color" content="#3E2C8C">
+  <title>Afras Order Ledger - 3D Dark Edition</title>
+  <meta name="theme-color" content="#0f111a">
   <style>
-* { box-sizing: border-box; }
+    * { box-sizing: border-box; }
 
-:root {
-  --ink: #211C3A;
-  --indigo: #3E2C8C;
-  --violet: #5B3FCB;
-  --teal: #0EA895;
-  --coral: #FF6B5E;
-  --amber: #FFB627;
-  --paper: #F5F3EE;
-  --line: #E3DEF7;
-  --muted: #9089B8;
-  --danger: #B0453A;
-}
+    :root {
+      --bg-main: #0b0d14;
+      --bg-card: #141724;
+      --bg-card-hover: #1b1f30;
+      --bg-glass: rgba(20, 23, 36, 0.75);
+      
+      --accent: #7c3aed;
+      --accent-glow: rgba(124, 58, 237, 0.4);
+      --accent-gradient: linear-gradient(135deg, #7c3aed, #06b6d4);
+      
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border-color: rgba(255, 255, 255, 0.08);
+      
+      --danger: #ef4444;
+      --success: #10b981;
+      --warning: #f59e0b;
+      
+      --shadow-3d: 0 20px 40px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.1) inset;
+      --shadow-card: 0 10px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.5);
+      --button-3d-shadow: 0 6px 0 #4c1d95, 0 10px 15px rgba(0,0,0,0.4);
+    }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  min-height: 100%;
-  background: linear-gradient(160deg, #EEF0FB 0%, #E4E9FB 35%, #F3EAFB 100%);
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  color: var(--ink);
-}
+    /* Color Theme Presets */
+    body[data-theme="violet"] {
+      --accent: #8b5cf6;
+      --accent-glow: rgba(139, 92, 246, 0.4);
+      --accent-gradient: linear-gradient(135deg, #8b5cf6, #d946ef);
+      --button-3d-shadow: 0 6px 0 #5b21b6, 0 10px 15px rgba(0,0,0,0.4);
+    }
+    body[data-theme="emerald"] {
+      --accent: #10b981;
+      --accent-glow: rgba(16, 185, 129, 0.4);
+      --accent-gradient: linear-gradient(135deg, #10b981, #06b6d4);
+      --button-3d-shadow: 0 6px 0 #047857, 0 10px 15px rgba(0,0,0,0.4);
+    }
+    body[data-theme="cyan"] {
+      --accent: #06b6d4;
+      --accent-glow: rgba(6, 182, 212, 0.4);
+      --accent-gradient: linear-gradient(135deg, #06b6d4, #3b82f6);
+      --button-3d-shadow: 0 6px 0 #0e7490, 0 10px 15px rgba(0,0,0,0.4);
+    }
+    body[data-theme="gold"] {
+      --accent: #f59e0b;
+      --accent-glow: rgba(245, 158, 11, 0.4);
+      --accent-gradient: linear-gradient(135deg, #f59e0b, #ef4444);
+      --button-3d-shadow: 0 6px 0 #b45309, 0 10px 15px rgba(0,0,0,0.4);
+    }
+    body[data-theme="crimson"] {
+      --accent: #ef4444;
+      --accent-glow: rgba(239, 68, 68, 0.4);
+      --accent-gradient: linear-gradient(135deg, #ef4444, #ec4899);
+      --button-3d-shadow: 0 6px 0 #b91c1c, 0 10px 15px rgba(0,0,0,0.4);
+    }
 
-#app {
-  max-width: 920px;
-  margin: 0 auto;
-  padding: 20px 16px 60px;
-  min-height: 100vh;
-}
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: var(--bg-main);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color: var(--text-main);
+      background-image: 
+        radial-gradient(circle at 15% 15%, var(--accent-glow) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.15) 0%, transparent 40%);
+      background-attachment: fixed;
+    }
 
-/* ---------- PIN gate ---------- */
-.pin-gate {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-.pin-card {
-  background: #fff;
-  border-radius: 18px;
-  padding: 32px 28px;
-  width: 100%;
-  max-width: 340px;
-  text-align: center;
-  box-shadow: 0 24px 60px rgba(33,28,58,0.25);
-}
-.pin-card .brand-mark {
-  width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 14px;
-  background: linear-gradient(145deg, var(--amber), var(--coral));
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 800; color: #2A1A00; font-size: 18px;
-}
-.pin-card h2 { font-family: Georgia, serif; margin: 0 0 4px; color: var(--indigo); }
-.pin-card p { color: var(--muted); font-size: 13px; margin: 0 0 18px; }
-.pin-input {
-  width: 100%; padding: 12px; border: 1.5px solid var(--line); border-radius: 10px;
-  font-size: 20px; text-align: center; letter-spacing: 6px; margin-bottom: 14px;
-}
-.pin-error { color: var(--danger); font-size: 12.5px; margin-bottom: 10px; min-height: 16px; }
+    #app {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+      min-height: 100vh;
+    }
 
-/* ---------- Header ---------- */
-header.app-header {
-  background: linear-gradient(135deg, var(--indigo) 0%, var(--violet) 55%, var(--teal) 130%);
-  border-radius: 18px;
-  padding: 20px 24px;
-  margin-bottom: 22px;
-  box-shadow: 0 16px 32px -12px rgba(62,44,140,0.55), 0 4px 10px rgba(62,44,140,0.3);
-  color: #fff;
-}
-.header-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-.brand-mark {
-  width: 42px; height: 42px; border-radius: 12px;
-  background: linear-gradient(145deg, var(--amber), var(--coral));
-  color: #2A1A00; display: flex; align-items: center; justify-content: center;
-  font-weight: 800; font-size: 16px; flex-shrink: 0;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
-}
-.brand-logo-img { width: 42px; height: 42px; border-radius: 12px; object-fit: cover; background: #fff; flex-shrink: 0; }
-.company-name { font-size: 17px; font-weight: 700; }
-.project-name { font-size: 12.5px; color: #D9D2FF; margin-top: 1px; }
-.header-row { display: flex; justify-content: space-between; align-items: flex-end; }
-.app-title { font-family: Georgia, serif; font-size: 28px; font-weight: 700; margin: 0; }
-.header-meta { text-align: right; background: rgba(255,255,255,0.16); border-radius: 10px; padding: 6px 12px; }
-.header-meta-label { font-size: 10.5px; color: #E4E0FF; }
-.header-meta-value { font-size: 15px; color: var(--amber); font-weight: 700; }
-.settings-btn {
-  background: rgba(255,255,255,0.18); border: none; border-radius: 10px;
-  width: 34px; height: 34px; font-size: 15px; color: #fff; cursor: pointer; flex-shrink: 0;
-}
-.sync-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-.sync-dot.online { background: #8FD6BF; }
-.sync-dot.offline { background: var(--coral); }
-.sync-status { font-size: 11px; color: #E4E0FF; margin-top: 4px; }
+    /* ---------- 3D Header ---------- */
+    header.app-header {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 22px 28px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-3d);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+    }
+    header.app-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: var(--accent-gradient);
+    }
+    .header-top { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+    .brand-mark {
+      width: 48px; height: 48px; border-radius: 14px;
+      background: var(--accent-gradient);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 18px; flex-shrink: 0;
+      box-shadow: 0 8px 20px var(--accent-glow);
+    }
+    .brand-logo-img { width: 48px; height: 48px; border-radius: 14px; object-fit: cover; flex-shrink: 0; }
+    .company-name { font-size: 19px; font-weight: 800; letter-spacing: 0.5px; }
+    .project-name { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+    .header-row { display: flex; justify-content: space-between; align-items: flex-end; }
+    .app-title { font-size: 26px; font-weight: 800; margin: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .header-meta { text-align: right; background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); border-radius: 12px; padding: 8px 16px; }
+    .header-meta-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+    .header-meta-value { font-size: 16px; color: var(--accent); font-weight: 700; }
+    .settings-btn {
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); border-radius: 12px;
+      width: 40px; height: 40px; font-size: 18px; color: var(--text-main); cursor: pointer; flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+    .settings-btn:hover { background: rgba(255,255,255,0.12); transform: rotate(45deg); }
+    .sync-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+    .sync-dot.online { background: var(--success); box-shadow: 0 0 10px var(--success); }
+    .sync-dot.offline { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
+    .sync-status { font-size: 12px; color: var(--text-muted); margin-top: 8px; display: flex; align-items: center; }
 
-/* ---------- Tabs ---------- */
-nav.tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-.tab-btn {
-  background: #fff; border: none; padding: 10px 16px; font-size: 13.5px; color: #5B5680;
-  cursor: pointer; border-radius: 10px; font-weight: 600; box-shadow: 0 2px 6px rgba(62,44,140,0.10);
-}
-.tab-btn.active { color: #fff; background: linear-gradient(135deg, var(--violet), var(--teal)); box-shadow: 0 8px 18px -6px rgba(62,44,140,0.55); }
+    /* ---------- 3D Tabs ---------- */
+    nav.tabs { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+    .tab-btn {
+      background: var(--bg-card); border: 1px solid var(--border-color); padding: 12px 22px; font-size: 14px; color: var(--text-muted);
+      cursor: pointer; border-radius: 14px; font-weight: 600; box-shadow: var(--shadow-card); transition: all 0.2s ease;
+    }
+    .tab-btn:hover { color: var(--text-main); background: var(--bg-card-hover); }
+    .tab-btn.active {
+      color: #fff; background: var(--accent-gradient); border-color: transparent;
+      box-shadow: 0 10px 20px var(--accent-glow); transform: translateY(-2px);
+    }
 
-/* ---------- Month bar ---------- */
-.month-bar { display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 18px; }
-.month-arrow {
-  background: linear-gradient(145deg, #fff, #EDE9FB); border: none; border-radius: 10px;
-  width: 34px; height: 34px; font-size: 18px; color: var(--violet); cursor: pointer;
-  box-shadow: 0 4px 10px rgba(62,44,140,0.18); font-weight: 700;
-}
-.month-label { font-family: Georgia, serif; font-size: 19px; min-width: 160px; text-align: center; color: var(--indigo); font-weight: 700; }
+    /* ---------- Month bar ---------- */
+    .month-bar { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 20px; }
+    .month-arrow {
+      background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px;
+      width: 38px; height: 38px; font-size: 18px; color: var(--accent); cursor: pointer;
+      box-shadow: var(--shadow-card); font-weight: 700; transition: all 0.2s;
+    }
+    .month-arrow:hover { background: var(--bg-card-hover); transform: scale(1.05); }
+    .month-label { font-size: 20px; min-width: 180px; text-align: center; color: var(--text-main); font-weight: 700; }
 
-/* ---------- Table ---------- */
-.table-wrap { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: #fff; box-shadow: 0 10px 30px -14px rgba(62,44,140,0.35); overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-th { padding: 11px 12px; font-size: 11.5px; color: #7A75A0; font-weight: 700; border-bottom: 1px solid var(--line); background: #F7F5FE; text-align: left; }
-td { padding: 9px 12px; border-bottom: 1px solid #F0EDFB; vertical-align: middle; }
-.item-name { font-size: 13.5px; }
-.item-id { font-size: 11px; color: #A6A1C9; margin-top: 1px; }
-.qty-input {
-  width: 64px; padding: 6px 8px; border: 1.5px solid #DCD5F5; border-radius: 7px;
-  text-align: center; font-size: 13.5px; color: var(--indigo); font-weight: 600;
-}
-.row-active { background: #F0F5F3; }
+    /* ---------- 3D Table styling ---------- */
+    .table-wrap {
+      border: 1px solid var(--border-color); border-radius: 18px; overflow: hidden;
+      background: var(--bg-card); box-shadow: var(--shadow-3d); overflow-x: auto;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th {
+      padding: 14px 16px; font-size: 12px; color: var(--text-muted); font-weight: 700;
+      border-bottom: 1px solid var(--border-color); background: rgba(255,255,255,0.02); text-align: left;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    td { padding: 12px 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr.row-active { background: rgba(124, 58, 237, 0.08); }
+    .item-name { font-size: 14px; font-weight: 600; color: var(--text-main); }
+    .item-id { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .qty-input {
+      width: 70px; padding: 8px 10px; border: 1.5px solid var(--border-color); border-radius: 10px;
+      text-align: center; font-size: 14px; color: #fff; font-weight: 700; background: rgba(0,0,0,0.4);
+      transition: all 0.2s;
+    }
+    .qty-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
 
-/* ---------- Summary bar ---------- */
-.summary-bar {
-  display: flex; justify-content: space-between; align-items: center; margin-top: 16px;
-  padding: 16px 20px; background: linear-gradient(135deg, var(--ink) 0%, var(--indigo) 60%, var(--teal) 140%);
-  border-radius: 14px; color: #fff; box-shadow: 0 14px 30px -14px rgba(33,28,58,0.6);
-}
-.summary-lines { font-size: 12.5px; color: #C9C3F0; }
-.summary-right { display: flex; align-items: baseline; gap: 10px; }
-.summary-label { font-size: 12.5px; color: #C9C3F0; }
-.summary-value { font-size: 23px; font-weight: 800; color: var(--amber); }
+    /* ---------- Summary Bar ---------- */
+    .summary-bar {
+      display: flex; justify-content: space-between; align-items: center; margin-top: 20px;
+      padding: 20px 24px; background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 18px; color: #fff; box-shadow: var(--shadow-3d); position: relative; overflow: hidden;
+    }
+    .summary-bar::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--accent-gradient);
+    }
+    .summary-lines { font-size: 14px; color: var(--text-muted); font-weight: 600; }
+    .summary-right { display: flex; align-items: baseline; gap: 12px; }
+    .summary-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; }
+    .summary-value { font-size: 26px; font-weight: 800; color: var(--accent); }
 
-/* ---------- Buttons ---------- */
-.btn-primary {
-  background: linear-gradient(135deg, var(--coral), var(--amber)); color: #2A1A00; border: none;
-  border-radius: 10px; padding: 10px 18px; font-size: 13.5px; cursor: pointer; font-weight: 700;
-  box-shadow: 0 8px 18px -6px rgba(255,107,94,0.55);
-}
-.btn-secondary {
-  background: #fff; color: var(--indigo); border: 1.5px solid #DCD5F5; border-radius: 10px;
-  padding: 9px 16px; font-size: 13.5px; cursor: pointer; font-weight: 600;
-}
-.btn-link { background: none; border: none; color: var(--violet); font-size: 13px; cursor: pointer; font-weight: 600; padding: 0; }
-.btn-link.danger { color: var(--danger); }
+    /* ---------- 3D Buttons ---------- */
+    .btn-primary {
+      background: var(--accent-gradient); color: #fff; border: none;
+      border-radius: 12px; padding: 12px 22px; font-size: 14px; cursor: pointer; font-weight: 700;
+      box-shadow: 0 8px 20px var(--accent-glow); transition: all 0.2s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 25px var(--accent-glow); }
+    .btn-secondary {
+      background: rgba(255,255,255,0.06); color: var(--text-main); border: 1px solid var(--border-color);
+      border-radius: 12px; padding: 10px 18px; font-size: 14px; cursor: pointer; font-weight: 600; transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.12); }
+    .btn-link { background: none; border: none; color: var(--accent); font-size: 13px; cursor: pointer; font-weight: 600; padding: 0; }
+    .btn-link.danger { color: var(--danger); }
 
-/* ---------- Convert row ---------- */
-.convert-btn {
-  background: linear-gradient(145deg, #FFF4DC, #FFE7B0); border: none; border-radius: 7px;
-  width: 26px; height: 26px; font-size: 13px; color: #8A5B00; cursor: pointer; font-weight: 700;
-}
-.convert-row { background: #FBF7EE; }
-.convert-row td { padding: 10px 14px; }
-.convert-input { width: 80px; padding: 5px 8px; border: 1.5px solid #F0D28C; border-radius: 6px; text-align: center; font-size: 13px; margin: 0 8px; }
-.convert-result { font-weight: 700; color: var(--indigo); margin-right: 10px; }
-.convert-pack-info { font-size: 11.5px; color: #A6A1C9; margin-right: 12px; }
-.convert-use-btn { background: linear-gradient(135deg, var(--violet), var(--teal)); color: #fff; border: none; border-radius: 7px; padding: 5px 12px; font-size: 12px; cursor: pointer; font-weight: 600; }
+    /* ---------- Converter Row ---------- */
+    .convert-btn {
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); border-radius: 8px;
+      width: 32px; height: 32px; font-size: 14px; color: var(--text-main); cursor: pointer; transition: all 0.2s;
+    }
+    .convert-btn:hover { background: var(--accent); color: #fff; }
+    .convert-row { background: rgba(0,0,0,0.3); }
+    .convert-input { width: 90px; padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 8px; background: #000; color: #fff; text-align: center; }
+    .convert-result { font-weight: 700; color: var(--accent); margin: 0 8px; }
+    .convert-pack-info { font-size: 12px; color: var(--text-muted); margin-right: 12px; }
+    .convert-use-btn { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 6px 14px; font-size: 12px; cursor: pointer; font-weight: 600; }
 
-/* ---------- History ---------- */
-.history-grid { display: grid; grid-template-columns: 220px 1fr; gap: 18px; }
-.history-list { display: flex; flex-direction: column; gap: 6px; }
-.history-item { display: flex; justify-content: space-between; padding: 10px 12px; background: #fff; border: none; border-radius: 10px; font-size: 13px; cursor: pointer; box-shadow: 0 2px 8px rgba(62,44,140,0.10); }
-.history-item.active { background: linear-gradient(135deg, var(--violet), var(--teal)); color: #fff; }
-@media (max-width: 640px) { .history-grid { grid-template-columns: 1fr; } }
+    /* ---------- History Grid ---------- */
+    .history-grid { display: grid; grid-template-columns: 240px 1fr; gap: 20px; }
+    .history-list { display: flex; flex-direction: column; gap: 8px; }
+    .history-item {
+      display: flex; justify-content: space-between; padding: 12px 16px; background: var(--bg-card);
+      border: 1px solid var(--border-color); border-radius: 12px; font-size: 14px; color: var(--text-main);
+      cursor: pointer; box-shadow: var(--shadow-card); transition: all 0.2s;
+    }
+    .history-item:hover { background: var(--bg-card-hover); }
+    .history-item.active { background: var(--accent-gradient); border-color: transparent; color: #fff; font-weight: 700; }
+    @media (max-width: 640px) { .history-grid { grid-template-columns: 1fr; } }
 
-/* ---------- Bills ---------- */
-.drop-zone { display: block; border: 2px dashed #C9BFF2; border-radius: 14px; padding: 22px 16px; text-align: center; cursor: pointer; background: #FBFAFF; margin-bottom: 16px; }
-.drop-zone.active { border-color: var(--violet); background: #F0ECFF; }
-.drop-zone-icon { font-size: 20px; color: var(--violet); margin-bottom: 6px; }
-.drop-zone-text { font-size: 13.5px; color: var(--indigo); font-weight: 600; }
-.drop-zone-hint { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
-.bills-list { display: flex; flex-direction: column; gap: 8px; }
-.bill-row { display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 10px; padding: 10px 14px; box-shadow: 0 2px 8px rgba(62,44,140,0.10); }
-.bill-icon { width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(145deg, var(--coral), var(--amber)); color: #2A1A00; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.bill-name { font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.bill-meta { font-size: 11.5px; color: var(--muted); }
+    /* ---------- Bills Dropzone ---------- */
+    .drop-zone {
+      display: block; border: 2px dashed var(--border-color); border-radius: 18px; padding: 30px 20px;
+      text-align: center; cursor: pointer; background: var(--bg-card); transition: all 0.2s; margin-bottom: 20px;
+    }
+    .drop-zone:hover, .drop-zone.active { border-color: var(--accent); background: rgba(124, 58, 237, 0.05); }
+    .drop-zone-icon { font-size: 32px; color: var(--accent); margin-bottom: 8px; }
+    .drop-zone-text { font-size: 15px; color: var(--text-main); font-weight: 600; }
+    .drop-zone-hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    .bills-list { display: flex; flex-direction: column; gap: 10px; }
+    .bill-row {
+      display: flex; align-items: center; gap: 14px; background: var(--bg-card);
+      border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 16px; box-shadow: var(--shadow-card);
+    }
+    .bill-icon {
+      width: 40px; height: 40px; border-radius: 10px; background: var(--accent-gradient);
+      color: #fff; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .bill-name { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-main); }
+    .bill-meta { font-size: 12px; color: var(--text-muted); }
 
-/* ---------- Empty state ---------- */
-.empty { text-align: center; padding: 50px 20px; border: 1px dashed var(--line); border-radius: 14px; background: #fff; }
-.empty-title { font-family: Georgia, serif; font-size: 18px; margin-bottom: 6px; color: var(--indigo); }
-.empty-body { font-size: 13.5px; color: var(--muted); }
+    /* ---------- Catalogue & Inputs ---------- */
+    .catalogue-bar { display: flex; justify-content: space-between; gap: 14px; margin-bottom: 18px; }
+    .search-input {
+      flex: 1; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 12px;
+      background: var(--bg-card); color: #fff; font-size: 14px;
+    }
+    .search-input:focus { outline: none; border-color: var(--accent); }
 
-/* ---------- Catalogue ---------- */
-.catalogue-bar { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
-.search-input { flex: 1; padding: 10px 14px; border: 1.5px solid #DCD5F5; border-radius: 10px; font-size: 13.5px; }
+    /* ---------- Modals ---------- */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px;
+    }
+    .modal {
+      background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px;
+      padding: 28px; width: 100%; max-width: 420px; box-shadow: var(--shadow-3d); max-height: 90vh; overflow-y: auto;
+    }
+    .modal h3 { font-size: 20px; margin: 0 0 18px; color: var(--text-main); }
+    .field-label { display: block; font-size: 12px; color: var(--text-muted); margin: 12px 0 6px; font-weight: 600; text-transform: uppercase; }
+    .field-input {
+      width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 10px;
+      background: rgba(0,0,0,0.4); color: #fff; font-size: 14px;
+    }
+    .field-input:focus { outline: none; border-color: var(--accent); }
+    .modal-actions { display: flex; gap: 10px; margin-top: 24px; align-items: center; }
+    .two-col { display: flex; gap: 12px; }
+    .two-col > div { flex: 1; }
 
-/* ---------- Modal ---------- */
-.modal-overlay { position: fixed; inset: 0; background: rgba(33,28,58,0.5); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px; }
-.modal { background: #fff; border-radius: 16px; padding: 24px; width: 100%; max-width: 380px; box-shadow: 0 24px 60px rgba(33,28,58,0.4); max-height: 90vh; overflow-y: auto; }
-.modal h3 { font-family: Georgia, serif; font-size: 18px; margin: 0 0 16px; color: var(--indigo); }
-.field-label { display: block; font-size: 11.5px; color: var(--muted); margin: 10px 0 4px; font-weight: 600; }
-.field-input { width: 100%; padding: 9px 12px; border: 1.5px solid #DCD5F5; border-radius: 8px; font-size: 13.5px; }
-.field-hint { font-size: 11.5px; color: var(--muted); margin-top: 5px; line-height: 1.4; }
-.modal-actions { display: flex; gap: 10px; margin-top: 20px; align-items: center; }
-.two-col { display: flex; gap: 12px; }
-.two-col > div { flex: 1; }
+    /* ---------- Theme Palette Picker ---------- */
+    .theme-picker-row { display: flex; gap: 10px; margin-top: 8px; }
+    .theme-circle {
+      width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;
+    }
+    .theme-circle:hover, .theme-circle.active { transform: scale(1.15); border-color: #fff; }
 
-/* ---------- Toast ---------- */
-.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, var(--ink), var(--indigo)); color: #fff; padding: 11px 20px; border-radius: 10px; font-size: 13px; box-shadow: 0 10px 26px rgba(33,28,58,0.4); z-index: 100; }
+    /* ---------- Toast ---------- */
+    .toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: var(--bg-card); border: 1px solid var(--accent); color: #fff; padding: 12px 24px;
+      border-radius: 12px; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 200; font-weight: 600;
+    }
 
-/* ---------- Footer ---------- */
-footer.app-footer { text-align: center; margin-top: 36px; font-size: 12px; color: var(--muted); }
-
-/* ---------- Settings modal extras ---------- */
-.logo-pick-row { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
-.logo-preview { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; border: 1px solid var(--line); }
-.bg-toggle-row { display: flex; gap: 8px; margin-top: 4px; }
-.bg-toggle-btn { flex: 1; padding: 8px 10px; border: 1.5px solid #DCD5F5; border-radius: 8px; background: #fff; color: #5B5680; font-size: 12.5px; cursor: pointer; font-weight: 600; }
-.bg-toggle-btn.active { background: linear-gradient(135deg, var(--violet), var(--teal)); color: #fff; border-color: transparent; }
-.color-pick-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-.color-input { width: 44px; height: 34px; border: none; border-radius: 8px; cursor: pointer; padding: 0; }
-
+    footer.app-footer { text-align: center; margin-top: 40px; font-size: 12px; color: var(--text-muted); letter-spacing: 0.5px; }
   </style>
 </head>
-<body>
+<body data-theme="violet">
 
   <div id="app">
-    <div id="app-inner">
-      <header class="app-header">
-        <div class="header-top">
-          <div id="logo-wrap"><div class="brand-mark">AT</div></div>
-          <div style="flex:1;">
-            <div class="company-name">Afras Trading &amp; Co.</div>
-            <div class="project-name">Al Majmaa Project</div>
-          </div>
-          <button class="settings-btn" id="settings-btn" title="Logo aur background badlein">⚙</button>
+    <header class="app-header">
+      <div class="header-top">
+        <div id="logo-wrap"><div class="brand-mark">AT</div></div>
+        <div style="flex:1;">
+          <div class="company-name">Afras Trading &amp; Co.</div>
+          <div class="project-name">Al Majmaa Project</div>
         </div>
-        <div class="header-row">
-          <h1 class="app-title">Order Ledger</h1>
-          <div class="header-meta">
-            <div class="header-meta-label">Catalogue</div>
-            <div class="header-meta-value" id="catalogue-count">0 items</div>
-          </div>
+        <button class="settings-btn" id="settings-btn" title="Settings & Themes">⚙</button>
+      </div>
+      <div class="header-row">
+        <h1 class="app-title">Order Ledger</h1>
+        <div class="header-meta">
+          <div class="header-meta-label">Catalogue</div>
+          <div class="header-meta-value" id="catalogue-count">0 items</div>
         </div>
-        <div class="sync-status"><span class="sync-dot online" id="sync-dot"></span><span id="sync-label">Connecting…</span></div>
-      </header>
+      </div>
+      <div class="sync-status">
+        <span class="sync-dot online" id="sync-dot"></span>
+        <span id="sync-label">Connecting…</span>
+      </div>
+    </header>
 
-      <nav class="tabs">
-        <button class="tab-btn" data-tab="order">New Order</button>
-        <button class="tab-btn" data-tab="history">History</button>
-        <button class="tab-btn" data-tab="bills">Bills</button>
-        <button class="tab-btn" data-tab="catalogue">Catalogue</button>
-      </nav>
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="order">New Order</button>
+      <button class="tab-btn" data-tab="history">History</button>
+      <button class="tab-btn" data-tab="bills">Bills</button>
+      <button class="tab-btn" data-tab="catalogue">Catalogue</button>
+    </nav>
 
-      <main id="main"></main>
+    <main id="main"></main>
 
-      <footer class="app-footer">Created by Muhammad Fawad Ali</footer>
-    </div>
+    <footer class="app-footer">Created by Muhammad Fawad Ali</footer>
   </div>
 
   <div id="modal-root"></div>
   <div class="toast" id="toast" style="display:none;"></div>
 
   <script type="module">
-const firebaseConfig = {
-  apiKey: "AIzaSyA7jQCrAAG-yAGRyqhHReWwvJnbzrFW4kY",
-  authDomain: "afras-order-ledger-54d01.firebaseapp.com",
-  projectId: "afras-order-ledger-54d01",
-  storageBucket: "afras-order-ledger-54d01.firebasestorage.app",
-  messagingSenderId: "1080945134096",
-  appId: "1:1080945134096:web:4ba7915a41188bbbac1895",
-};
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import {
-  getFirestore, doc, setDoc, collection, onSnapshot,
-  deleteDoc, enableIndexedDbPersistence,
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import {
-  getAuth, signInAnonymously, onAuthStateChanged,
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyA7jQCrAAG-yAGRyqhHReWwvJnbzrFW4kY",
+      authDomain: "afras-order-ledger-54d01.firebaseapp.com",
+      projectId: "afras-order-ledger-54d01",
+      storageBucket: "afras-order-ledger-54d01.firebasestorage.app",
+      messagingSenderId: "1080945134096",
+      appId: "1:1080945134096:web:4ba7915a41188bbbac1895",
+    };
 
-// ---------------- Firebase setup ----------------
-// Note: bills are stored as base64 directly inside Firestore documents
-// (not Firebase Storage) so this app stays fully on the free Spark plan —
-// no billing account required. That caps each bill at ~700KB (see
-// MAX_BILL_BYTES below), since a single Firestore document has a 1MiB limit.
-const fbApp = initializeApp(firebaseConfig);
-const db = getFirestore(fbApp);
-const auth = getAuth(fbApp);
-try { enableIndexedDbPersistence(db); } catch (e) { /* multiple tabs open, fine to skip */ }
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+    import {
+      getFirestore, doc, setDoc, collection, onSnapshot,
+      deleteDoc, enableIndexedDbPersistence
+    } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import {
+      getAuth, signInAnonymously, onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
-// ---------------- Constants ----------------
-const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-const MAX_BILL_BYTES = 700 * 1024; // ~700KB raw file — keeps base64 + doc overhead under Firestore's 1MiB document limit
+    const fbApp = initializeApp(firebaseConfig);
+    const db = getFirestore(fbApp);
+    const auth = getAuth(fbApp);
 
-const SEED_PRODUCTS = [
-  { id: "PRD-0000586", name: "Sunsilk Hair Shampoo (400ml)", uom: "Dozen", price: 144 },
-  { id: "PRD-0000177", name: "Lux Bathing Liquid Soap (250ml)", uom: "Carton", price: 195 },
-  { id: "PRD-0013459", name: "Big Body Scrub Leefah", uom: "Piece", price: 9 },
-  { id: "PRD-0000574", name: "Nunu Body Powder (200mg) 1x12Pcs", uom: "Dozen", price: 80 },
-  { id: "PRD-0014137", name: "Colgate Toothbrush - Soft", uom: "Dozen", price: 72 },
-  { id: "PRD-0000563", name: "Colgate Toothpaste (120gm)", uom: "Dozen", price: 52 },
-  { id: "PRD-0000619", name: "Hair Brush", uom: "Piece", price: 7 },
-  { id: "PRD-0005457", name: "Sunsilk Hair Cream 1x12x275ml", uom: "Dozen", price: 285 },
-  { id: "PRD-0014361", name: "Veet Hair Remover Sensitive (100gm)", uom: "Dozen", price: 110 },
-  { id: "PRD-0000581", name: "Nunu Baby Cologne (200ml)", uom: "Dozen", price: 251 },
-  { id: "PRD-0000576", name: "Vaseline Petroleum Jelly (250ml)", uom: "Dozen", price: 183 },
-  { id: "PRD-0013793", name: "FINE Adult Diaper, Size S (18x4)", uom: "Carton", price: 76 },
-  { id: "PRD-0000516", name: "FINE Adult Diaper, Size L (20x4)", uom: "Carton", price: 85 },
-  { id: "PRD-0000488", name: "FINE Adult Diaper, Size M (24x4)", uom: "Carton", price: 86 },
-  { id: "PRD-0000501", name: "FINE Adult Diaper, Size XL (20x4)", uom: "Carton", price: 107 },
-  { id: "PRD-0000490b", name: "Medical Bed UnderPads 90cm (15x8=120)", uom: "Carton", price: 75 },
-  { id: "PRD-0000490", name: "Lifree Adult Diaper Small 6x25Pcs", uom: "Carton", price: 90 },
-  { id: "PRD-0016488", name: "Lotus Adult Diaper Medium 2x50=100", uom: "Carton", price: 85, packSize: 100 },
-  { id: "PRD-0016489", name: "Lotus Adult Diaper Large 2x50=100", uom: "Carton", price: 98, packSize: 100 },
-  { id: "PRD-0016490", name: "Lotus Adult Diaper X-Large 2x50=100", uom: "Carton", price: 112, packSize: 100 },
-  { id: "PRD-0000517", name: "Bed Underpads 90x60cm 1x3x50pcs", uom: "Carton", price: 84 },
-  { id: "PRD-0014213", name: "Rexona Deodorant Spray (150ml)", uom: "Dozen", price: 130 },
-  { id: "PRD-0000205", name: "Disposable Aprons HDPE (700Pcs)", uom: "Carton", price: 60 },
-  { id: "PRD-0012314", name: "Face Mask 1x40x50 (CTN 2000Pcs)", uom: "Carton", price: 150 },
-  { id: "PRD-0000300", name: "Disposable Sanitary Towels (160x80cm)", uom: "Carton", price: 250 },
-  { id: "PRD-0012226", name: "Vinyl Hand Gloves, Size L - CTN/700", uom: "Carton", price: 76 },
-  { id: "PRD-0012227", name: "Vinyl Hand Gloves, Size M - CTN/700", uom: "Carton", price: 76 },
-  { id: "PRD-0000206", name: "Disposable Head Cover (100Pcs)", uom: "Carton", price: 75 },
-  { id: "PRD-0012325", name: "Fam Sanitary Pads 6 Pack (3x10Pcs)", uom: "Carton", price: 120 },
-  { id: "PRD-0002277", name: "Nail Clipper", uom: "Piece", price: 5 },
-  { id: "PRD-0014158", name: "Shaving Razor Blade - Lord", uom: "Piece", price: 2.5 },
-  { id: "PRD-0014269", name: "Panasonic Beard/Hair Trimmer ER2031K", uom: "Piece", price: 260 },
-  { id: "PRD-0012317", name: "Fine Facial Tissue Prime (1x36x86x2Ply)", uom: "Carton", price: 76 },
-  { id: "PRD-0000572", name: "Vaseline Body Lotion (200ml)", uom: "Dozen", price: 156 },
-  { id: "PRD-0016843", name: "Disposable Catheter Tip Syringe 60ml (1x25Pcs)", uom: "Carton", price: 37.5 },
-  { id: "PRD-0016844", name: "Baby Food Dispensing Spoon Feeder", uom: "Piece", price: 50 },
-  { id: "PRD-0016847", name: "Sunst Cafe Powder Blue Perfume", uom: "Piece", price: 65 },
-  { id: "PRD-0016848", name: "Capriccio Perfume", uom: "Piece", price: 65 },
-  { id: "PRD-0016913", name: "Nivea Men Shaving Foam 200ml (1x12Pcs)", uom: "Carton", price: 250 },
-  { id: "PRD-0016914", name: "Cetaphil Gentle Cleansing Bar 127gm (1x12Pcs)", uom: "Dozen", price: 260 },
-  { id: "PRD-0016915", name: "Estremo White Petroleum Gel 1000gm (1x12Pcs)", uom: "Dozen", price: 340 },
-  { id: "PRD-0000012", name: "Trash Bag - Black (55 Gallon)", uom: "Bag", price: 67 },
-];
+    try { enableIndexedDbPersistence(db); } catch (e) { /* Tab open handling */ }
 
-// ---------------- Helpers ----------------
-function fmt(n) {
-  if (n === null || n === undefined || isNaN(n)) return "0";
-  return Number(n).toLocaleString(undefined, { maximumFractionDigits: 2 });
-}
-function defaultPackSize(uom) { return String(uom).toLowerCase() === "dozen" ? 12 : 1; }
-function withPackSize(p) { return { ...p, packSize: p.packSize && p.packSize > 0 ? p.packSize : defaultPackSize(p.uom) }; }
-function currentMonthKey() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-}
-function monthLabel(key) {
-  const [y, m] = key.split("-").map(Number);
-  return `${MONTH_NAMES[m - 1]} ${y}`;
-}
-function shiftMonthKey(key, delta) {
-  const [y, m] = key.split("-").map(Number);
-  const d = new Date(y, m - 1 + delta, 1);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-}
-function escapeHtml(s) {
-  return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-}
-// ---------------- App state ----------------
-const state = {
-  products: [],
-  orders: {},
-  bills: [],
-  branding: { logo: null, bgColor: null },
-  tab: "order",
-  activeMonth: currentMonthKey(),
-  historyMonth: null,
-  billsMonth: currentMonthKey(),
-  convertRow: null,
-  ready: false,
-};
+    const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const MAX_BILL_BYTES = 700 * 1024;
 
-let toastTimer = null;
-function showToast(msg) {
-  const el = document.getElementById("toast");
-  el.textContent = msg;
-  el.style.display = "block";
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { el.style.display = "none"; }, 2200);
-}
+    const SEED_PRODUCTS = [
+      { id: "PRD-0000586", name: "Sunsilk Hair Shampoo (400ml)", uom: "Dozen", price: 144 },
+      { id: "PRD-0000177", name: "Lux Bathing Liquid Soap (250ml)", uom: "Carton", price: 195 },
+      { id: "PRD-0013459", name: "Big Body Scrub Leefah", uom: "Piece", price: 9 },
+      { id: "PRD-0000574", name: "Nunu Body Powder (200mg) 1x12Pcs", uom: "Dozen", price: 80 },
+      { id: "PRD-0014137", name: "Colgate Toothbrush - Soft", uom: "Dozen", price: 72 },
+      { id: "PRD-0000563", name: "Colgate Toothpaste (120gm)", uom: "Dozen", price: 52 },
+      { id: "PRD-0000619", name: "Hair Brush", uom: "Piece", price: 7 },
+      { id: "PRD-0005457", name: "Sunsilk Hair Cream 1x12x275ml", uom: "Dozen", price: 285 },
+      { id: "PRD-0014361", name: "Veet Hair Remover Sensitive (100gm)", uom: "Dozen", price: 110 },
+      { id: "PRD-0000581", name: "Nunu Baby Cologne (200ml)", uom: "Dozen", price: 251 },
+      { id: "PRD-0000576", name: "Vaseline Petroleum Jelly (250ml)", uom: "Dozen", price: 183 },
+      { id: "PRD-0013793", name: "FINE Adult Diaper, Size S (18x4)", uom: "Carton", price: 76 },
+      { id: "PRD-0000516", name: "FINE Adult Diaper, Size L (20x4)", uom: "Carton", price: 85 },
+      { id: "PRD-0000488", name: "FINE Adult Diaper, Size M (24x4)", uom: "Carton", price: 86 },
+      { id: "PRD-0000501", name: "FINE Adult Diaper, Size XL (20x4)", uom: "Carton", price: 107 },
+      { id: "PRD-0000490b", name: "Medical Bed UnderPads 90cm (15x8=120)", uom: "Carton", price: 75 },
+      { id: "PRD-0000490", name: "Lifree Adult Diaper Small 6x25Pcs", uom: "Carton", price: 90 },
+      { id: "PRD-0016488", name: "Lotus Adult Diaper Medium 2x50=100", uom: "Carton", price: 85, packSize: 100 },
+      { id: "PRD-0016489", name: "Lotus Adult Diaper Large 2x50=100", uom: "Carton", price: 98, packSize: 100 },
+      { id: "PRD-0016490", name: "Lotus Adult Diaper X-Large 2x50=100", uom: "Carton", price: 112, packSize: 100 },
+      { id: "PRD-0000517", name: "Bed Underpads 90x60cm 1x3x50pcs", uom: "Carton", price: 84 },
+      { id: "PRD-0014213", name: "Rexona Deodorant Spray (150ml)", uom: "Dozen", price: 130 },
+      { id: "PRD-0000205", name: "Disposable Aprons HDPE (700Pcs)", uom: "Carton", price: 60 },
+      { id: "PRD-0012314", name: "Face Mask 1x40x50 (CTN 2000Pcs)", uom: "Carton", price: 150 },
+      { id: "PRD-0000300", name: "Disposable Sanitary Towels (160x80cm)", uom: "Carton", price: 250 },
+      { id: "PRD-0012226", name: "Vinyl Hand Gloves, Size L - CTN/700", uom: "Carton", price: 76 },
+      { id: "PRD-0012227", name: "Vinyl Hand Gloves, Size M - CTN/700", uom: "Carton", price: 76 },
+      { id: "PRD-0000206", name: "Disposable Head Cover (100Pcs)", uom: "Carton", price: 75 },
+      { id: "PRD-0012325", name: "Fam Sanitary Pads 6 Pack (3x10Pcs)", uom: "Carton", price: 120 },
+      { id: "PRD-0002277", name: "Nail Clipper", uom: "Piece", price: 5 },
+      { id: "PRD-0014158", name: "Shaving Razor Blade - Lord", uom: "Piece", price: 2.5 },
+      { id: "PRD-0014269", name: "Panasonic Beard/Hair Trimmer ER2031K", uom: "Piece", price: 260 },
+      { id: "PRD-0012317", name: "Fine Facial Tissue Prime (1x36x86x2Ply)", uom: "Carton", price: 76 },
+      { id: "PRD-0000572", name: "Vaseline Body Lotion (200ml)", uom: "Dozen", price: 156 },
+      { id: "PRD-0016843", name: "Disposable Catheter Tip Syringe 60ml (1x25Pcs)", uom: "Carton", price: 37.5 },
+      { id: "PRD-0016844", name: "Baby Food Dispensing Spoon Feeder", uom: "Piece", price: 50 },
+      { id: "PRD-0016847", name: "Sunst Cafe Powder Blue Perfume", uom: "Piece", price: 65 },
+      { id: "PRD-0016848", name: "Capriccio Perfume", uom: "Piece", price: 65 },
+      { id: "PRD-0016913", name: "Nivea Men Shaving Foam 200ml (1x12Pcs)", uom: "Carton", price: 250 },
+      { id: "PRD-0016914", name: "Cetaphil Gentle Cleansing Bar 127gm (1x12Pcs)", uom: "Dozen", price: 260 },
+      { id: "PRD-0016915", name: "Estremo White Petroleum Gel 1000gm (1x12Pcs)", uom: "Dozen", price: 340 },
+      { id: "PRD-0000012", name: "Trash Bag - Black (55 Gallon)", uom: "Bag", price: 67 },
+    ];
 
-// ---------------- App config doc (branding lives here) ----------------
-const CONFIG_DOC = () => doc(db, "config", "app");
-
-function unlockApp() {
-  document.getElementById("app").style.display = "block";
-  startLiveSync();
-}
-
-// ---------------- Firestore live sync ----------------
-function startLiveSync() {
-  onSnapshot(collection(db, "products"), (snap) => {
-    if (snap.empty && state.products.length === 0) {
-      seedProducts();
-      return;
+    function fmt(n) {
+      if (n === null || n === undefined || isNaN(n)) return "0";
+      return Number(n).toLocaleString(undefined, { maximumFractionDigits: 2 });
     }
-    state.products = snap.docs.map((d) => withPackSize({ id: d.id, ...d.data() })).sort((a, b) => a.name.localeCompare(b.name));
-    state.ready = true;
-    render();
-  });
-
-  onSnapshot(collection(db, "orders"), (snap) => {
-    const next = {};
-    snap.docs.forEach((d) => { next[d.id] = d.data(); });
-    state.orders = next;
-    render();
-  });
-
-  onSnapshot(collection(db, "bills"), (snap) => {
-    state.bills = snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
-    render();
-  });
-
-  onSnapshot(CONFIG_DOC(), (snap) => {
-    if (snap.exists()) {
-      const data = snap.data();
-      state.branding = { logo: data.logo || null, bgColor: data.bgColor || null };
-      render();
+    function defaultPackSize(uom) { return String(uom).toLowerCase() === "dozen" ? 12 : 1; }
+    function withPackSize(p) { return { ...p, packSize: p.packSize && p.packSize > 0 ? p.packSize : defaultPackSize(p.uom) }; }
+    function currentMonthKey() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
     }
-  });
+    function monthLabel(key) {
+      const [y, m] = key.split("-").map(Number);
+      return `${MONTH_NAMES[m - 1]} ${y}`;
+    }
+    function shiftMonthKey(key, delta) {
+      const [y, m] = key.split("-").map(Number);
+      const d = new Date(y, m - 1 + delta, 1);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    }
+    function escapeHtml(s) {
+      return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    }
 
-  window.addEventListener("online", updateSyncStatus);
-  window.addEventListener("offline", updateSyncStatus);
-  updateSyncStatus();
-}
+    const state = {
+      products: [],
+      orders: {},
+      bills: [],
+      branding: { logo: null, theme: "violet" },
+      tab: "order",
+      activeMonth: currentMonthKey(),
+      historyMonth: null,
+      billsMonth: currentMonthKey(),
+      convertRow: null,
+      ready: false,
+    };
 
-async function seedProducts() {
-  for (const p of SEED_PRODUCTS) {
-    await setDoc(doc(db, "products", p.id), withPackSize(p));
-  }
-}
+    let toastTimer = null;
+    function showToast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.style.display = "block";
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { el.style.display = "none"; }, 2500);
+    }
 
-function updateSyncStatus() {
-  const dot = document.getElementById("sync-dot");
-  const label = document.getElementById("sync-label");
-  if (!dot) return;
-  if (navigator.onLine) {
-    dot.className = "sync-dot online";
-    label.textContent = "Synced — sab devices par live";
-  } else {
-    dot.className = "sync-dot offline";
-    label.textContent = "Offline — internet aane par sync hoga";
-  }
-}
+    const CONFIG_DOC = () => doc(db, "config", "app");
 
-// ---------------- Mutations ----------------
-async function setQty(productId, value) {
-  const n = value === "" ? "" : Math.max(0, Number(value));
-  const monthKey = state.activeMonth;
-  const existing = state.orders[monthKey]?.qty || {};
-  const qty = { ...existing, [productId]: n };
-  await setDoc(doc(db, "orders", monthKey), { qty, savedAt: Date.now() }, { merge: true });
-}
-
-async function saveProduct(draft) {
-  const clean = {
-    name: draft.name,
-    uom: draft.uom,
-    price: Number(draft.price),
-    packSize: draft.packSize && Number(draft.packSize) > 0 ? Number(draft.packSize) : defaultPackSize(draft.uom),
-  };
-  await setDoc(doc(db, "products", draft.id), clean);
-  showToast("Product save ho gaya");
-}
-async function deleteProductById(id) {
-  await deleteDoc(doc(db, "products", id));
-  showToast("Product hata diya");
-}
-async function clearMonth(monthKey) {
-  await deleteDoc(doc(db, "orders", monthKey));
-  showToast(`${monthLabel(monthKey)} ka order clear ho gaya`);
-}
-
-async function uploadBills(fileList, monthKey) {
-  const files = Array.from(fileList || []);
-  let saved = 0, tooLarge = false;
-  for (const file of files) {
-    if (file.type !== "application/pdf") continue;
-    if (file.size > MAX_BILL_BYTES) { tooLarge = true; continue; }
-    const dataUrl = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = () => reject(reader.error);
-      reader.readAsDataURL(file);
-    });
-    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    try {
-      await setDoc(doc(db, "bills", id), {
-        name: file.name, size: file.size, monthKey, dataUrl, savedAt: Date.now(),
+    function startLiveSync() {
+      onSnapshot(collection(db, "products"), (snap) => {
+        if (snap.empty && state.products.length === 0) {
+          seedProducts();
+          return;
+        }
+        state.products = snap.docs.map((d) => withPackSize({ id: d.id, ...d.data() })).sort((a, b) => a.name.localeCompare(b.name));
+        state.ready = true;
+        render();
       });
-      saved++;
-    } catch (e) {
-      tooLarge = true; // Firestore rejected it (too big for a single document, or other error)
+
+      onSnapshot(collection(db, "orders"), (snap) => {
+        const next = {};
+        snap.docs.forEach((d) => { next[d.id] = d.data(); });
+        state.orders = next;
+        render();
+      });
+
+      onSnapshot(collection(db, "bills"), (snap) => {
+        state.bills = snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
+        render();
+      });
+
+      onSnapshot(CONFIG_DOC(), (snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
+          state.branding = { logo: data.logo || null, theme: data.theme || "violet" };
+          document.body.setAttribute("data-theme", state.branding.theme);
+          render();
+        }
+      });
+
+      window.addEventListener("online", updateSyncStatus);
+      window.addEventListener("offline", updateSyncStatus);
+      updateSyncStatus();
     }
-  }
-  if (saved > 0) showToast(`${saved} bill${saved === 1 ? "" : "s"} upload ho gayi`);
-  if (tooLarge) showToast("Kuch files save nahi hui - 700KB se choti PDF try karein");
-}
 
-async function deleteBill(bill) {
-  await deleteDoc(doc(db, "bills", bill.id));
-}
-
-function downloadBill(bill) {
-  if (!bill.dataUrl) { showToast("File nahi mili"); return; }
-  const a = document.createElement("a");
-  a.href = bill.dataUrl;
-  a.download = bill.name;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
-
-async function saveBranding(next) {
-  await setDoc(CONFIG_DOC(), next, { merge: true });
-}
-
-// ---------------- Render ----------------
-function render() {
-  if (!state.ready) return;
-  renderHeader();
-  renderTabs();
-  const main = document.getElementById("main");
-  if (state.tab === "order") main.innerHTML = renderOrderTab();
-  else if (state.tab === "history") main.innerHTML = renderHistoryTab();
-  else if (state.tab === "bills") main.innerHTML = renderBillsTab();
-  else if (state.tab === "catalogue") main.innerHTML = renderCatalogueTab();
-  attachTabEvents();
-
-  const appEl = document.getElementById("app");
-  appEl.style.background = state.branding.bgColor
-    ? `linear-gradient(160deg, ${state.branding.bgColor}22 0%, ${state.branding.bgColor}33 50%, ${state.branding.bgColor}22 100%)`
-    : "";
-}
-
-function renderHeader() {
-  const logoWrap = document.getElementById("logo-wrap");
-  logoWrap.innerHTML = state.branding.logo
-    ? `<img src="${state.branding.logo}" class="brand-logo-img" alt="Logo">`
-    : `<div class="brand-mark">AT</div>`;
-  document.getElementById("catalogue-count").textContent = `${state.products.length} items`;
-}
-
-function renderTabs() {
-  document.querySelectorAll(".tab-btn").forEach((btn) => {
-    btn.classList.toggle("active", btn.dataset.tab === state.tab);
-  });
-}
-
-// ---- Order tab ----
-function renderOrderTab() {
-  const qty = state.orders[state.activeMonth]?.qty || {};
-  let grandTotal = 0, lineCount = 0;
-  const rows = state.products.map((p) => {
-    const q = qty[p.id];
-    const qNum = Number(q) || 0;
-    const lineTotal = qNum * Number(p.price || 0);
-    if (qNum > 0) { grandTotal += lineTotal; lineCount++; }
-    const isConverting = state.convertRow === p.id;
-    return `
-      <tr class="${qNum > 0 ? "row-active" : ""}">
-        <td><div class="item-name">${escapeHtml(p.name)}</div><div class="item-id">${escapeHtml(p.id)}</div></td>
-        <td>${escapeHtml(p.uom)}</td>
-        <td style="text-align:right">${fmt(p.price)}</td>
-        <td style="text-align:center">
-          <input type="number" min="0" class="qty-input" data-qty="${p.id}" value="${q === undefined ? "" : q}" placeholder="0">
-        </td>
-        <td style="text-align:right;font-weight:${qNum > 0 ? 600 : 400}">${lineTotal > 0 ? fmt(lineTotal) : "—"}</td>
-        <td style="text-align:center"><button class="convert-btn" data-convert="${p.id}">⇄</button></td>
-      </tr>
-      ${isConverting ? `
-      <tr class="convert-row">
-        <td colspan="6">
-          <span style="font-size:12.5px;color:#8A5B00;font-weight:600;margin-right:8px;">Pieces chahiye:</span>
-          <input type="number" min="0" class="convert-input" id="convert-pieces" placeholder="e.g. 100">
-          <span style="margin-right:8px;">=</span>
-          <span class="convert-result" id="convert-result">—</span>
-          <span class="convert-pack-info">(1 ${escapeHtml(p.uom)} = ${p.packSize} pieces)</span>
-          <button class="convert-use-btn" data-use="${p.id}" data-pack="${p.packSize}">Qty mein daal dein</button>
-        </td>
-      </tr>` : ""}
-    `;
-  }).join("");
-
-  return `
-    <div class="month-bar">
-      <button class="month-arrow" data-shift="-1">‹</button>
-      <div class="month-label">${monthLabel(state.activeMonth)}</div>
-      <button class="month-arrow" data-shift="1">›</button>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Item</th><th>UOM</th><th style="text-align:right">Price</th><th style="text-align:center">Qty</th><th style="text-align:right">Total</th><th></th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>
-    <div class="summary-bar">
-      <div class="summary-lines">${lineCount} line${lineCount === 1 ? "" : "s"}</div>
-      <div class="summary-right"><span class="summary-label">Grand Total</span><span class="summary-value">${fmt(grandTotal)}</span></div>
-    </div>
-  `;
-}
-
-// ---- History tab ----
-function totalForMonth(key) {
-  const qty = state.orders[key]?.qty || {};
-  return state.products.reduce((sum, p) => sum + (Number(qty[p.id]) || 0) * Number(p.price || 0), 0);
-}
-
-function renderHistoryTab() {
-  const monthKeys = Object.keys(state.orders).sort().reverse();
-  if (monthKeys.length === 0) {
-    return `<div class="empty"><div class="empty-title">Abhi koi order save nahi hua</div><div class="empty-body">"New Order" tab mein quantity daaliye — yahan automatically save ho jayega.</div></div>`;
-  }
-  const openKey = state.historyMonth && monthKeys.includes(state.historyMonth) ? state.historyMonth : monthKeys[0];
-  const openQty = state.orders[openKey]?.qty || {};
-  const lines = state.products.map((p) => ({ ...p, qty: Number(openQty[p.id]) || 0 })).filter((l) => l.qty > 0);
-
-  const listHtml = monthKeys.map((k) => `
-    <button class="history-item ${k === openKey ? "active" : ""}" data-history="${k}">
-      <span>${monthLabel(k)}</span><span>${fmt(totalForMonth(k))}</span>
-    </button>
-  `).join("");
-
-  const linesHtml = lines.length === 0
-    ? `<div class="empty-body">Is mahine koi quantity nahi bhari gayi.</div>`
-    : `<table>
-        <thead><tr><th>Item</th><th style="text-align:center">Qty</th><th style="text-align:right">Total</th></tr></thead>
-        <tbody>${lines.map((l) => `<tr><td>${escapeHtml(l.name)}</td><td style="text-align:center">${l.qty}</td><td style="text-align:right">${fmt(l.qty * l.price)}</td></tr>`).join("")}</tbody>
-      </table>`;
-
-  return `
-    <div class="history-grid">
-      <div class="history-list">${listHtml}</div>
-      <div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-          <h2 style="font-family:Georgia,serif;font-size:19px;margin:0;color:var(--indigo);">${monthLabel(openKey)}</h2>
-          <div style="display:flex;gap:14px;">
-            <button class="btn-link" data-open-month="${openKey}">Edit</button>
-            <button class="btn-link danger" data-clear-month="${openKey}">Clear</button>
-          </div>
-        </div>
-        ${linesHtml}
-        <div class="summary-bar" style="margin-top:16px;">
-          <div></div>
-          <div class="summary-right"><span class="summary-label">Grand Total</span><span class="summary-value">${fmt(totalForMonth(openKey))}</span></div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-// ---- Bills tab ----
-function renderBillsTab() {
-  const monthBills = state.bills.filter((b) => b.monthKey === state.billsMonth);
-  const listHtml = monthBills.length === 0
-    ? `<div class="empty"><div class="empty-title">${monthLabel(state.billsMonth)} ke liye koi bill nahi</div><div class="empty-body">Upar se PDF upload karein.</div></div>`
-    : `<div class="bills-list">${monthBills.map((b) => `
-        <div class="bill-row">
-          <div class="bill-icon">PDF</div>
-          <div style="flex:1;min-width:0;">
-            <div class="bill-name">${escapeHtml(b.name)}</div>
-            <div class="bill-meta">${(b.size / 1024 / 1024).toFixed(2)} MB</div>
-          </div>
-          <button class="btn-link" data-download-bill="${b.id}">Download</button>
-          <button class="btn-link danger" data-delete-bill="${b.id}">Delete</button>
-        </div>
-      `).join("")}</div>`;
-
-  return `
-    <div class="month-bar">
-      <button class="month-arrow" data-bills-shift="-1">‹</button>
-      <div class="month-label">${monthLabel(state.billsMonth)}</div>
-      <button class="month-arrow" data-bills-shift="1">›</button>
-    </div>
-    <label class="drop-zone" id="drop-zone">
-      <input type="file" accept="application/pdf" multiple style="display:none" id="bill-file-input">
-      <div class="drop-zone-icon">⬆</div>
-      <div class="drop-zone-text">PDF bills yahan drop karein ya click karke choose karein</div>
-      <div class="drop-zone-hint">Ek ya kai files ek saath — har file max 700KB</div>
-    </label>
-    ${listHtml}
-  `;
-}
-
-// ---- Catalogue tab ----
-let catalogueQuery = "";
-function renderCatalogueTab() {
-  const filtered = state.products.filter((p) =>
-    p.name.toLowerCase().includes(catalogueQuery.toLowerCase()) || p.id.toLowerCase().includes(catalogueQuery.toLowerCase())
-  );
-  const rows = filtered.map((p) => `
-    <tr>
-      <td><div class="item-name">${escapeHtml(p.name)}</div><div class="item-id">${escapeHtml(p.id)}</div></td>
-      <td>${escapeHtml(p.uom)}</td>
-      <td style="text-align:right">${fmt(p.price)}</td>
-      <td style="text-align:right"><button class="btn-link" data-edit-product="${p.id}">Edit</button></td>
-    </tr>
-  `).join("");
-
-  return `
-    <div class="catalogue-bar">
-      <input type="text" class="search-input" id="catalogue-search" placeholder="Item search karein…" value="${escapeHtml(catalogueQuery)}">
-      <button class="btn-primary" id="add-product-btn">+ Add item</button>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Item</th><th>UOM</th><th style="text-align:right">Price</th><th></th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>
-  `;
-}
-
-// ---------------- Event wiring ----------------
-function attachTabEvents() {
-  // Order tab
-  document.querySelectorAll("[data-shift]").forEach((btn) => {
-    btn.onclick = () => { state.activeMonth = shiftMonthKey(state.activeMonth, Number(btn.dataset.shift)); render(); };
-  });
-  document.querySelectorAll("[data-qty]").forEach((input) => {
-    input.onchange = (e) => setQty(input.dataset.qty, e.target.value);
-  });
-  document.querySelectorAll("[data-convert]").forEach((btn) => {
-    btn.onclick = () => { state.convertRow = state.convertRow === btn.dataset.convert ? null : btn.dataset.convert; render(); };
-  });
-  const pieces = document.getElementById("convert-pieces");
-  if (pieces) {
-    const useBtn = document.querySelector("[data-use]");
-    const pack = Number(useBtn?.dataset.pack || 1);
-    const uomLabel = (document.querySelector(".convert-pack-info")?.textContent.match(/1 (\S+) =/) || [, ""])[1];
-    pieces.oninput = () => {
-      const val = Number(pieces.value);
-      const resultEl = document.getElementById("convert-result");
-      resultEl.textContent = pieces.value !== "" && !isNaN(val) ? `${fmt(val / pack)} ${uomLabel}` : "—";
-    };
-  }
-  document.querySelectorAll("[data-use]").forEach((btn) => {
-    btn.onclick = async () => {
-      const pack = Number(btn.dataset.pack);
-      const val = Number(document.getElementById("convert-pieces").value);
-      if (!isNaN(val)) {
-        await setQty(btn.dataset.use, Math.round((val / pack) * 100) / 100);
+    async function seedProducts() {
+      for (const p of SEED_PRODUCTS) {
+        await setDoc(doc(db, "products", p.id), withPackSize(p));
       }
-      state.convertRow = null;
-      render();
-    };
-  });
+    }
 
-  // History tab
-  document.querySelectorAll("[data-history]").forEach((btn) => {
-    btn.onclick = () => { state.historyMonth = btn.dataset.history; render(); };
-  });
-  document.querySelectorAll("[data-open-month]").forEach((btn) => {
-    btn.onclick = () => { state.activeMonth = btn.dataset.openMonth; state.tab = "order"; render(); };
-  });
-  document.querySelectorAll("[data-clear-month]").forEach((btn) => {
-    btn.onclick = () => { if (confirm("Is mahine ka order clear karein?")) clearMonth(btn.dataset.clearMonth); };
-  });
+    function updateSyncStatus() {
+      const dot = document.getElementById("sync-dot");
+      const label = document.getElementById("sync-label");
+      if (!dot) return;
+      if (navigator.onLine) {
+        dot.className = "sync-dot online";
+        label.textContent = "Synced — Live connection active";
+      } else {
+        dot.className = "sync-dot offline";
+        label.textContent = "Offline — Changes saved locally";
+      }
+    }
 
-  // Bills tab
-  const dropZone = document.getElementById("drop-zone");
-  if (dropZone) {
-    const fileInput = document.getElementById("bill-file-input");
-    fileInput.onchange = (e) => { uploadBills(e.target.files, state.billsMonth); e.target.value = ""; };
-    dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add("active"); };
-    dropZone.ondragleave = () => dropZone.classList.remove("active");
-    dropZone.ondrop = (e) => {
-      e.preventDefault();
-      dropZone.classList.remove("active");
-      uploadBills(e.dataTransfer.files, state.billsMonth);
-    };
-  }
-  document.querySelectorAll("[data-bills-shift]").forEach((btn) => {
-    btn.onclick = () => { state.billsMonth = shiftMonthKey(state.billsMonth, Number(btn.dataset.billsShift)); render(); };
-  });
-  document.querySelectorAll("[data-download-bill]").forEach((btn) => {
-    btn.onclick = () => { const bill = state.bills.find((b) => b.id === btn.dataset.downloadBill); if (bill) downloadBill(bill); };
-  });
-  document.querySelectorAll("[data-delete-bill]").forEach((btn) => {
-    btn.onclick = () => {
-      const bill = state.bills.find((b) => b.id === btn.dataset.deleteBill);
-      if (bill && confirm(`"${bill.name}" delete karein?`)) deleteBill(bill);
-    };
-  });
+    async function setQty(productId, value) {
+      const n = value === "" ? "" : Math.max(0, Number(value));
+      const monthKey = state.activeMonth;
+      const existing = state.orders[monthKey]?.qty || {};
+      const qty = { ...existing, [productId]: n };
+      await setDoc(doc(db, "orders", monthKey), { qty, savedAt: Date.now() }, { merge: true });
+    }
 
-  // Catalogue tab
-  const search = document.getElementById("catalogue-search");
-  if (search) {
-    search.oninput = (e) => { catalogueQuery = e.target.value; render(); document.getElementById("catalogue-search").focus(); document.getElementById("catalogue-search").setSelectionRange(catalogueQuery.length, catalogueQuery.length); };
-  }
-  const addBtn = document.getElementById("add-product-btn");
-  if (addBtn) addBtn.onclick = () => openProductModal(null);
-  document.querySelectorAll("[data-edit-product]").forEach((btn) => {
-    btn.onclick = () => openProductModal(state.products.find((p) => p.id === btn.dataset.editProduct));
-  });
-}
+    async function saveProduct(draft) {
+      const clean = {
+        name: draft.name,
+        uom: draft.uom,
+        price: Number(draft.price),
+        packSize: draft.packSize && Number(draft.packSize) > 0 ? Number(draft.packSize) : defaultPackSize(draft.uom),
+      };
+      await setDoc(doc(db, "products", draft.id), clean);
+      showToast("Item saved successfully");
+    }
 
-// Top-level tab switching + settings button
-document.querySelectorAll(".tab-btn").forEach((btn) => {
-  btn.onclick = () => { state.tab = btn.dataset.tab; render(); };
-});
-document.getElementById("settings-btn").onclick = () => openSettingsModal();
+    async function deleteProductById(id) {
+      await deleteDoc(doc(db, "products", id));
+      showToast("Item deleted");
+    }
 
-// ---------------- Product modal ----------------
-function openProductModal(product) {
-  const overlay = document.getElementById("modal-root");
-  const isNew = !product;
-  const draft = product ? { ...product } : { id: "", name: "", uom: "Piece", price: "", packSize: "" };
-  overlay.innerHTML = `
-    <div class="modal-overlay" id="product-overlay">
-      <div class="modal">
-        <h3>${isNew ? "Naya item" : "Item edit karein"}</h3>
-        <label class="field-label">Item Number</label>
-        <input class="field-input" id="pf-id" value="${escapeHtml(draft.id)}" ${isNew ? "" : "disabled"} placeholder="PRD-0000000">
-        <label class="field-label">Item Name</label>
-        <input class="field-input" id="pf-name" value="${escapeHtml(draft.name)}" placeholder="Item ka naam">
-        <div class="two-col">
-          <div><label class="field-label">UOM</label><input class="field-input" id="pf-uom" value="${escapeHtml(draft.uom)}" placeholder="Piece / Dozen / Carton"></div>
-          <div><label class="field-label">Price</label><input class="field-input" id="pf-price" type="number" value="${draft.price}" placeholder="0"></div>
+    async function clearMonth(monthKey) {
+      await deleteDoc(doc(db, "orders", monthKey));
+      showToast(`${monthLabel(monthKey)} orders cleared`);
+    }
+
+    async function uploadBills(fileList, monthKey) {
+      const files = Array.from(fileList || []);
+      let saved = 0, tooLarge = false;
+      for (const file of files) {
+        if (file.type !== "application/pdf") continue;
+        if (file.size > MAX_BILL_BYTES) { tooLarge = true; continue; }
+        const dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = () => reject(reader.error);
+          reader.readAsDataURL(file);
+        });
+        const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        try {
+          await setDoc(doc(db, "bills", id), {
+            name: file.name, size: file.size, monthKey, dataUrl, savedAt: Date.now(),
+          });
+          saved++;
+        } catch (e) {
+          tooLarge = true;
+        }
+      }
+      if (saved > 0) showToast(`${saved} bill(s) uploaded`);
+      if (tooLarge) showToast("Some files were skipped (>700KB max size)");
+    }
+
+    async function deleteBill(bill) {
+      await deleteDoc(doc(db, "bills", bill.id));
+      showToast("Bill deleted");
+    }
+
+    function downloadBill(bill) {
+      if (!bill.dataUrl) { showToast("File not found"); return; }
+      const a = document.createElement("a");
+      a.href = bill.dataUrl;
+      a.download = bill.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    async function saveBranding(next) {
+      await setDoc(CONFIG_DOC(), next, { merge: true });
+    }
+
+    function render() {
+      if (!state.ready) return;
+      renderHeader();
+      renderTabs();
+      const main = document.getElementById("main");
+      if (state.tab === "order") main.innerHTML = renderOrderTab();
+      else if (state.tab === "history") main.innerHTML = renderHistoryTab();
+      else if (state.tab === "bills") main.innerHTML = renderBillsTab();
+      else if (state.tab === "catalogue") main.innerHTML = renderCatalogueTab();
+      attachTabEvents();
+    }
+
+    function renderHeader() {
+      const logoWrap = document.getElementById("logo-wrap");
+      logoWrap.innerHTML = state.branding.logo
+        ? `<img src="${state.branding.logo}" class="brand-logo-img" alt="Logo">`
+        : `<div class="brand-mark">AT</div>`;
+      document.getElementById("catalogue-count").textContent = `${state.products.length} items`;
+    }
+
+    function renderTabs() {
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.tab === state.tab);
+      });
+    }
+
+    function renderOrderTab() {
+      const qty = state.orders[state.activeMonth]?.qty || {};
+      let grandTotal = 0, lineCount = 0;
+      const rows = state.products.map((p) => {
+        const q = qty[p.id];
+        const qNum = Number(q) || 0;
+        const lineTotal = qNum * Number(p.price || 0);
+        if (qNum > 0) { grandTotal += lineTotal; lineCount++; }
+        const isConverting = state.convertRow === p.id;
+        return `
+          <tr class="${qNum > 0 ? "row-active" : ""}">
+            <td><div class="item-name">${escapeHtml(p.name)}</div><div class="item-id">${escapeHtml(p.id)}</div></td>
+            <td>${escapeHtml(p.uom)}</td>
+            <td style="text-align:right">${fmt(p.price)}</td>
+            <td style="text-align:center">
+              <input type="number" min="0" class="qty-input" data-qty="${p.id}" value="${q === undefined ? "" : q}" placeholder="0">
+            </td>
+            <td style="text-align:right;font-weight:${qNum > 0 ? 700 : 400}">${lineTotal > 0 ? fmt(lineTotal) : "—"}</td>
+            <td style="text-align:center"><button class="convert-btn" data-convert="${p.id}">⇄</button></td>
+          </tr>
+          ${isConverting ? `
+          <tr class="convert-row">
+            <td colspan="6">
+              <span style="font-size:12.5px;color:var(--accent);font-weight:600;margin-right:8px;">Pieces Required:</span>
+              <input type="number" min="0" class="convert-input" id="convert-pieces" placeholder="e.g. 100">
+              <span style="margin: 0 8px;">=</span>
+              <span class="convert-result" id="convert-result">—</span>
+              <span class="convert-pack-info">(1 ${escapeHtml(p.uom)} = ${p.packSize} pcs)</span>
+              <button class="convert-use-btn" data-use="${p.id}" data-pack="${p.packSize}">Apply Qty</button>
+            </td>
+          </tr>` : ""}
+        `;
+      }).join("");
+
+      return `
+        <div class="month-bar">
+          <button class="month-arrow" data-shift="-1">‹</button>
+          <div class="month-label">${monthLabel(state.activeMonth)}</div>
+          <button class="month-arrow" data-shift="1">›</button>
         </div>
-        <label class="field-label">Pack Size — pieces per UOM</label>
-        <input class="field-input" id="pf-pack" type="number" min="1" value="${draft.packSize || ""}" placeholder="e.g. 12">
-        <div class="field-hint">Agar 100 pieces chahiye aur pack size 12 hai, to order screen 8.33 dikhayega.</div>
-        <div class="modal-actions">
-          ${!isNew ? `<button class="btn-secondary" id="pf-delete" style="color:var(--danger);border-color:#E7C7C2;">Delete</button>` : ""}
-          <div style="flex:1"></div>
-          <button class="btn-secondary" id="pf-cancel">Cancel</button>
-          <button class="btn-primary" id="pf-save">Save</button>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Item</th><th>UOM</th><th style="text-align:right">Price</th><th style="text-align:center">Qty</th><th style="text-align:right">Total</th><th></th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
         </div>
-      </div>
-    </div>
-  `;
-  document.getElementById("pf-cancel").onclick = () => { overlay.innerHTML = ""; };
-  document.getElementById("product-overlay").onclick = (e) => { if (e.target.id === "product-overlay") overlay.innerHTML = ""; };
-  const delBtn = document.getElementById("pf-delete");
-  if (delBtn) delBtn.onclick = async () => { await deleteProductById(draft.id); overlay.innerHTML = ""; };
-  document.getElementById("pf-save").onclick = async () => {
-    const id = isNew ? document.getElementById("pf-id").value.trim() : draft.id;
-    const name = document.getElementById("pf-name").value.trim();
-    const uom = document.getElementById("pf-uom").value.trim();
-    const price = document.getElementById("pf-price").value;
-    const packSize = document.getElementById("pf-pack").value;
-    if (!id || !name || !uom || price === "" || isNaN(Number(price))) return;
-    await saveProduct({ id, name, uom, price, packSize });
-    overlay.innerHTML = "";
-  };
-}
+        <div class="summary-bar">
+          <div class="summary-lines">${lineCount} item line${lineCount === 1 ? "" : "s"}</div>
+          <div class="summary-right"><span class="summary-label">Grand Total</span><span class="summary-value">${fmt(grandTotal)}</span></div>
+        </div>
+      `;
+    }
 
-// ---------------- Settings modal (logo + background) ----------------
-function openSettingsModal() {
-  const overlay = document.getElementById("modal-root");
-  let logo = state.branding.logo;
-  let useCustomBg = !!state.branding.bgColor;
-  let bgColor = state.branding.bgColor || "#5B3FCB";
+    function totalForMonth(key) {
+      const qty = state.orders[key]?.qty || {};
+      return state.products.reduce((sum, p) => sum + (Number(qty[p.id]) || 0) * Number(p.price || 0), 0);
+    }
 
-  function draw() {
-    overlay.innerHTML = `
-      <div class="modal-overlay" id="settings-overlay">
-        <div class="modal">
-          <h3>Logo aur background</h3>
-          <label class="field-label">Company Logo</label>
-          <div class="logo-pick-row">
-            ${logo ? `<img src="${logo}" class="logo-preview">` : `<div class="brand-mark">AT</div>`}
-            <label class="btn-secondary" style="cursor:pointer;">Logo choose karein<input type="file" accept="image/*" style="display:none" id="logo-file"></label>
-            ${logo ? `<button class="btn-link" id="logo-remove">Remove</button>` : ""}
-          </div>
-          <label class="field-label">Background</label>
-          <div class="bg-toggle-row">
-            <button class="bg-toggle-btn ${!useCustomBg ? "active" : ""}" id="bg-default">Default</button>
-            <button class="bg-toggle-btn ${useCustomBg ? "active" : ""}" id="bg-custom">Custom color</button>
-          </div>
-          ${useCustomBg ? `<div class="color-pick-row"><input type="color" class="color-input" id="bg-color" value="${bgColor}"><span id="bg-color-val">${bgColor}</span></div>` : ""}
-          <div class="modal-actions">
-            <div style="flex:1"></div>
-            <button class="btn-secondary" id="settings-cancel">Cancel</button>
-            <button class="btn-primary" id="settings-save">Save</button>
+    function renderHistoryTab() {
+      const monthKeys = Object.keys(state.orders).sort().reverse();
+      if (monthKeys.length === 0) {
+        return `<div class="empty" style="text-align:center;padding:50px;"><div style="font-size:18px;font-weight:700;">No Saved Orders Yet</div><div style="color:var(--text-muted);margin-top:6px;">Start filling items in "New Order" tab.</div></div>`;
+      }
+      const openKey = state.historyMonth && monthKeys.includes(state.historyMonth) ? state.historyMonth : monthKeys[0];
+      const openQty = state.orders[openKey]?.qty || {};
+      const lines = state.products.map((p) => ({ ...p, qty: Number(openQty[p.id]) || 0 })).filter((l) => l.qty > 0);
+
+      const listHtml = monthKeys.map((k) => `
+        <button class="history-item ${k === openKey ? "active" : ""}" data-history="${k}">
+          <span>${monthLabel(k)}</span><span>${fmt(totalForMonth(k))}</span>
+        </button>
+      `).join("");
+
+      const linesHtml = lines.length === 0
+        ? `<div style="color:var(--text-muted);text-align:center;padding:20px;">No quantity entered for this month.</div>`
+        : `<div class="table-wrap">
+            <table>
+              <thead><tr><th>Item</th><th style="text-align:center">Qty</th><th style="text-align:right">Total</th></tr></thead>
+              <tbody>${lines.map((l) => `<tr><td>${escapeHtml(l.name)}</td><td style="text-align:center">${l.qty}</td><td style="text-align:right">${fmt(l.qty * l.price)}</td></tr>`).join("")}</tbody>
+            </table>
+          </div>`;
+
+      return `
+        <div class="history-grid">
+          <div class="history-list">${listHtml}</div>
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+              <h2 style="font-size:20px;margin:0;color:var(--text-main);">${monthLabel(openKey)}</h2>
+              <div style="display:flex;gap:14px;">
+                <button class="btn-link" data-open-month="${openKey}">Edit Order</button>
+                <button class="btn-link danger" data-clear-month="${openKey}">Clear</button>
+              </div>
+            </div>
+            ${linesHtml}
+            <div class="summary-bar" style="margin-top:16px;">
+              <div></div>
+              <div class="summary-right"><span class="summary-label">Grand Total</span><span class="summary-value">${fmt(totalForMonth(openKey))}</span></div>
+            </div>
           </div>
         </div>
-      </div>
-    `;
-    document.getElementById("settings-cancel").onclick = () => { overlay.innerHTML = ""; };
-    document.getElementById("settings-overlay").onclick = (e) => { if (e.target.id === "settings-overlay") overlay.innerHTML = ""; };
-    document.getElementById("logo-file").onchange = (e) => {
-      const file = e.target.files[0];
-      if (!file || !file.type.startsWith("image/")) return;
-      const reader = new FileReader();
-      reader.onload = () => { logo = reader.result; draw(); };
-      reader.readAsDataURL(file);
+      `;
+    }
+
+    function renderBillsTab() {
+      const monthBills = state.bills.filter((b) => b.monthKey === state.billsMonth);
+      const listHtml = monthBills.length === 0
+        ? `<div style="text-align:center;padding:40px;color:var(--text-muted);">No bills uploaded for ${monthLabel(state.billsMonth)}.</div>`
+        : `<div class="bills-list">${monthBills.map((b) => `
+            <div class="bill-row">
+              <div class="bill-icon">PDF</div>
+              <div style="flex:1;min-width:0;">
+                <div class="bill-name">${escapeHtml(b.name)}</div>
+                <div class="bill-meta">${(b.size / 1024 / 1024).toFixed(2)} MB</div>
+              </div>
+              <button class="btn-link" data-dl="${b.id}">Download</button>
+              <button class="btn-link danger" data-del="${b.id}">Delete</button>
+            </div>`).join("")}
+        </div>`;
+
+      return `
+        <div class="month-bar">
+          <button class="month-arrow" data-bill-shift="-1">‹</button>
+          <div class="month-label">${monthLabel(state.billsMonth)}</div>
+          <button class="month-arrow" data-bill-shift="1">›</button>
+        </div>
+        <label class="drop-zone" id="drop-zone">
+          <div class="drop-zone-icon">📄</div>
+          <div class="drop-zone-text">Tap to upload or drag & drop PDF bills</div>
+          <div class="drop-zone-hint">Max size 700KB per file</div>
+          <input type="file" multiple accept="application/pdf" id="bill-upload" style="display:none">
+        </label>
+        ${listHtml}
+      `;
+    }
+
+    function renderCatalogueTab() {
+      const rows = state.products.map(p => `
+        <tr>
+          <td><div class="item-name">${escapeHtml(p.name)}</div><div class="item-id">${escapeHtml(p.id)}</div></td>
+          <td>${escapeHtml(p.uom)}</td>
+          <td style="text-align:right">${fmt(p.price)}</td>
+          <td style="text-align:center">
+            <button class="btn-link" data-edit-prd="${p.id}">Edit</button>
+          </td>
+        </tr>
+      `).join("");
+      return `
+        <div class="catalogue-bar">
+          <input type="text" class="search-input" id="cat-search" placeholder="Search catalogue items...">
+          <button class="btn-primary" id="btn-add-prd">+ Add Item</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Item</th><th>UOM</th><th style="text-align:right">Price</th><th style="text-align:center">Action</th></tr></thead>
+            <tbody id="cat-tbody">${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function attachTabEvents() {
+      document.querySelectorAll(".tab-btn").forEach(b => {
+        b.onclick = () => { state.tab = b.dataset.tab; render(); };
+      });
+
+      document.querySelectorAll("[data-shift]").forEach(b => {
+        b.onclick = () => { state.activeMonth = shiftMonthKey(state.activeMonth, Number(b.dataset.shift)); render(); };
+      });
+
+      document.querySelectorAll(".qty-input").forEach(i => {
+        i.onchange = (e) => setQty(e.target.dataset.qty, e.target.value);
+      });
+
+      document.querySelectorAll(".convert-btn").forEach(b => {
+        b.onclick = () => { state.convertRow = state.convertRow === b.dataset.convert ? null : b.dataset.convert; render(); };
+      });
+
+      const ci = document.getElementById("convert-pieces");
+      if (ci) {
+        ci.oninput = (e) => {
+          const p = state.products.find(x => x.id === state.convertRow);
+          const res = document.getElementById("convert-result");
+          if (!p || !res) return;
+          const v = Number(e.target.value) || 0;
+          res.textContent = v > 0 ? (v / p.packSize).toFixed(2) + " " + p.uom : "—";
+        };
+      }
+
+      document.querySelectorAll(".convert-use-btn").forEach(b => {
+        b.onclick = () => {
+          const v = Number(document.getElementById("convert-pieces")?.value) || 0;
+          const pk = Number(b.dataset.pack) || 1;
+          setQty(b.dataset.use, Math.ceil(v / pk));
+          state.convertRow = null;
+          render();
+        };
+      });
+
+      document.querySelectorAll("[data-history]").forEach(b => {
+        b.onclick = () => { state.historyMonth = b.dataset.history; render(); };
+      });
+      document.querySelectorAll("[data-open-month]").forEach(b => {
+        b.onclick = () => { state.activeMonth = b.dataset.openMonth; state.tab = "order"; render(); };
+      });
+      document.querySelectorAll("[data-clear-month]").forEach(b => {
+        b.onclick = () => { if(confirm("Clear this month's order data?")) clearMonth(b.dataset.clearMonth); };
+      });
+
+      document.querySelectorAll("[data-bill-shift]").forEach(b => {
+        b.onclick = () => { state.billsMonth = shiftMonthKey(state.billsMonth, Number(b.dataset.billShift)); render(); };
+      });
+
+      const dropZone = document.getElementById("drop-zone");
+      const up = document.getElementById("bill-upload");
+      if (dropZone) {
+        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add("active"); };
+        dropZone.ondragleave = () => dropZone.classList.remove("active");
+        dropZone.ondrop = (e) => {
+          e.preventDefault();
+          dropZone.classList.remove("active");
+          if (e.dataTransfer.files.length) uploadBills(e.dataTransfer.files, state.billsMonth);
+        };
+      }
+      if (up) up.onchange = (e) => uploadBills(e.target.files, state.billsMonth);
+
+      document.querySelectorAll("[data-dl]").forEach(b => {
+        b.onclick = () => { const bill = state.bills.find(x => x.id === b.dataset.dl); if(bill) downloadBill(bill); };
+      });
+      document.querySelectorAll("[data-del]").forEach(b => {
+        b.onclick = () => { const bill = state.bills.find(x => x.id === b.dataset.del); if(bill && confirm("Delete this bill?")) deleteBill(bill); };
+      });
+
+      const addPrd = document.getElementById("btn-add-prd");
+      if (addPrd) addPrd.onclick = () => openMod();
+      document.querySelectorAll("[data-edit-prd]").forEach(b => {
+        b.onclick = () => openMod(state.products.find(x => x.id === b.dataset.editPrd));
+      });
+      const cs = document.getElementById("cat-search");
+      if (cs) {
+        cs.oninput = (e) => {
+          const q = e.target.value.toLowerCase();
+          document.querySelectorAll("#cat-tbody tr").forEach(tr => {
+            tr.style.display = tr.textContent.toLowerCase().includes(q) ? "" : "none";
+          });
+        };
+      }
+    }
+
+    function openMod(p = null) {
+      const root = document.getElementById("modal-root");
+      const isNew = !p;
+      const id = p?.id || `PRD-${Date.now().toString().slice(-7)}`;
+      root.innerHTML = `
+        <div class="modal-overlay">
+          <div class="modal">
+            <h3>${isNew ? "Add New Item" : "Edit Item"}</h3>
+            <label class="field-label">Item ID</label>
+            <input type="text" class="field-input" id="pm-id" value="${id}" disabled>
+            <label class="field-label">Item Name</label>
+            <input type="text" class="field-input" id="pm-name" value="${p?.name || ""}">
+            <div class="two-col">
+              <div><label class="field-label">UOM</label><input type="text" class="field-input" id="pm-uom" value="${p?.uom || ""}"></div>
+              <div><label class="field-label">Price</label><input type="number" step="0.01" class="field-input" id="pm-price" value="${p?.price || ""}"></div>
+            </div>
+            <label class="field-label">Pack Size (Pieces in 1 UOM)</label>
+            <input type="number" class="field-input" id="pm-pack" value="${p?.packSize || ""}">
+            <div class="modal-actions">
+              <button class="btn-primary" id="pm-save">Save Item</button>
+              <button class="btn-secondary" id="pm-close">Cancel</button>
+              ${!isNew ? `<button class="btn-link danger" style="margin-left:auto" id="pm-del">Delete</button>` : ""}
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById("pm-close").onclick = () => root.innerHTML = "";
+      document.getElementById("pm-save").onclick = () => {
+        saveProduct({
+          id: document.getElementById("pm-id").value,
+          name: document.getElementById("pm-name").value,
+          uom: document.getElementById("pm-uom").value,
+          price: document.getElementById("pm-price").value,
+          packSize: document.getElementById("pm-pack").value
+        });
+        root.innerHTML = "";
+      };
+      if (!isNew) {
+        document.getElementById("pm-del").onclick = () => {
+          if (confirm("Delete this item?")) { deleteProductById(id); root.innerHTML = ""; }
+        };
+      }
+    }
+
+    document.getElementById("settings-btn").onclick = () => {
+      const root = document.getElementById("modal-root");
+      root.innerHTML = `
+        <div class="modal-overlay">
+          <div class="modal">
+            <h3>Settings & Theme</h3>
+            <label class="field-label">Select Accent Theme Color</label>
+            <div class="theme-picker-row">
+              <div class="theme-circle ${state.branding.theme === 'violet' ? 'active' : ''}" style="background:#8b5cf6;" data-th="violet"></div>
+              <div class="theme-circle ${state.branding.theme === 'emerald' ? 'active' : ''}" style="background:#10b981;" data-th="emerald"></div>
+              <div class="theme-circle ${state.branding.theme === 'cyan' ? 'active' : ''}" style="background:#06b6d4;" data-th="cyan"></div>
+              <div class="theme-circle ${state.branding.theme === 'gold' ? 'active' : ''}" style="background:#f59e0b;" data-th="gold"></div>
+              <div class="theme-circle ${state.branding.theme === 'crimson' ? 'active' : ''}" style="background:#ef4444;" data-th="crimson"></div>
+            </div>
+            <label class="field-label" style="margin-top:18px;">Custom Logo URL</label>
+            <input type="text" class="field-input" id="sm-logo" value="${state.branding.logo || ""}" placeholder="https://...">
+            <div class="modal-actions">
+              <button class="btn-primary" id="sm-save">Save Settings</button>
+              <button class="btn-secondary" id="sm-close">Close</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      let selectedTheme = state.branding.theme || "violet";
+      document.querySelectorAll(".theme-circle").forEach(el => {
+        el.onclick = () => {
+          document.querySelectorAll(".theme-circle").forEach(x => x.classList.remove("active"));
+          el.classList.add("active");
+          selectedTheme = el.dataset.th;
+        };
+      });
+
+      document.getElementById("sm-close").onclick = () => root.innerHTML = "";
+      document.getElementById("sm-save").onclick = () => {
+        saveBranding({ theme: selectedTheme, logo: document.getElementById("sm-logo").value });
+        root.innerHTML = "";
+      };
     };
-    const removeBtn = document.getElementById("logo-remove");
-    if (removeBtn) removeBtn.onclick = () => { logo = null; draw(); };
-    document.getElementById("bg-default").onclick = () => { useCustomBg = false; draw(); };
-    document.getElementById("bg-custom").onclick = () => { useCustomBg = true; draw(); };
-    const colorInput = document.getElementById("bg-color");
-    if (colorInput) colorInput.oninput = (e) => { bgColor = e.target.value; document.getElementById("bg-color-val").textContent = bgColor; };
-    document.getElementById("settings-save").onclick = async () => {
-      await saveBranding({ logo, bgColor: useCustomBg ? bgColor : null });
-      overlay.innerHTML = "";
-    };
-  }
-  draw();
-}
 
-// ---------------- Boot ----------------
-signInAnonymously(auth).catch((e) => {
-  console.error("Auth failed", e);
-  showToast("Connection error — internet check karein");
-});
-
-onAuthStateChanged(auth, (user) => {
-  if (user) unlockApp();
-});
-
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        startLiveSync();
+      } else {
+        signInAnonymously(auth).catch(err => showToast("Auth failed: " + err.message));
+      }
+    });
   </script>
 </body>
 </html>
