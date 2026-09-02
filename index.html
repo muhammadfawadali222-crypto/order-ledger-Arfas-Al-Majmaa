@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al Majmaa HR Portal - Central Admin Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #6366f1;
+            --primary-dark: #3730a3;
+            --accent: #0ea5e9;
+            --ink: #1e1b2e;
+            --muted: #64748b;
+            --bg-1: #eef1fb;
+            --bg-2: #e3e8fb;
+            --bg-3: #dbe3fb;
+            --surface: rgba(255, 255, 255, 0.86);
+            --surface-solid: #ffffff;
+            --glass-border: rgba(255, 255, 255, 0.7);
+            --line: #e6e8f5;
+            --radius-lg: 22px;
+            --radius-md: 16px;
+            --radius-sm: 10px;
+            --shadow-soft: 0 10px 30px rgba(79, 70, 229, 0.08);
+            --shadow-lift: 0 16px 40px rgba(79, 70, 229, 0.16);
+            --green: #059669; --green-bg: #d1fae5; --green-line: #a7f3d0;
+            --amber: #b45309; --amber-bg: #ffedd5; --amber-line: #fed7aa;
+            --red: #be123c; --red-bg: #ffe4e6; --red-line: #fda4af;
+            --blue: #0369a1; --blue-bg: #e0f2fe; --blue-line: #bae6fd;
+            --violet: #6d28d9; --violet-bg: #f3e8ff; --violet-line: #e9d5ff;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background:
+                radial-gradient(1200px 500px at 10% -10%, var(--bg-3), transparent),
+                radial-gradient(900px 500px at 100% 0%, var(--bg-2), transparent),
+                var(--bg-1);
+            background-attachment: fixed;
+            color: var(--ink);
+            min-height: 100vh;
+            padding: 16px;
+            padding-bottom: 70px;
+        }
+        h1, h2, h3, h4, .display { font-family: 'Plus Jakarta Sans', sans-serif; }
+        ::selection { background: var(--primary-light); color: #fff; }
+        ::-webkit-scrollbar { height: 8px; width: 8px; }
+        ::-webkit-scrollbar-thumb { background: #c7cdf5; border-radius: 10px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        #toast-stack { position: fixed; top: 18px; right: 18px; z-index: 3000; display: flex; flex-direction: column; gap: 10px; max-width: 320px; }
+        .toast {
+            background: var(--surface-solid); border-radius: var(--radius-sm); padding: 12px 16px;
+            box-shadow: var(--shadow-lift); border-left: 4px solid var(--primary);
+            font-size: 13px; font-weight: 600; color: var(--ink);
+            animation: toastIn .25s ease-out; display: flex; align-items: center; gap: 8px;
+        }
+        .toast.success { border-left-color: var(--green); }
+        .toast.error { border-left-color: var(--red); }
+        @keyframes toastIn { from { transform: translateX(24px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        #login-container { display: flex; justify-content: center; align-items: center; min-height: 90vh; }
+        .login-card {
+            background: var(--surface); backdrop-filter: blur(18px); padding: 38px 28px;
+            border-radius: var(--radius-lg); box-shadow: var(--shadow-lift);
+            width: 100%; max-width: 440px; text-align: center; border: 1px solid var(--glass-border);
+        }
+        .auth-toggle { display: flex; gap: 6px; margin-bottom: 22px; background: var(--bg-2); padding: 4px; border-radius: 14px; }
+        .auth-toggle button { flex: 1; padding: 9px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px; background: transparent; color: var(--primary-dark); transition: all .2s; }
+        .auth-toggle button.active { background: #fff; color: var(--primary); box-shadow: var(--shadow-soft); }
+        .logo-preview { width: 74px; height: 74px; border-radius: 20px; object-fit: cover; margin-bottom: 16px; border: 3px solid var(--primary-light); background: #fff; }
+        .btn-stylish {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            color: white; border: none; padding: 11px 18px;
+            border-radius: 13px; font-weight: 700; font-size: 13px; cursor: pointer;
+            box-shadow: 0 8px 18px rgba(79, 70, 229, 0.28); transition: all .2s ease;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .btn-stylish:hover { transform: translateY(-2px); box-shadow: 0 12px 22px rgba(79, 70, 229, 0.34); }
+        .btn-stylish:active { transform: translateY(0); }
+        .btn-success { background: linear-gradient(135deg, #10b981, var(--green)); box-shadow: 0 8px 18px rgba(5,150,105,.28); }
+        .btn-danger { background: linear-gradient(135deg, #fb7185, var(--red)); box-shadow: 0 8px 18px rgba(190,18,60,.28); }
+        .btn-purple { background: linear-gradient(135deg, #a78bfa, var(--violet)); box-shadow: 0 8px 18px rgba(109,40,217,.28); }
+        .btn-warning { background: linear-gradient(135deg, #fbbf24, #d97706); box-shadow: 0 8px 18px rgba(217,119,6,.28); }
+        .btn-muted { background: #64748b; box-shadow: 0 8px 18px rgba(100,116,139,.24); }
+        .btn-clear-file {
+            background: var(--red-bg); color: var(--red); border: 1px solid var(--red-line);
+            border-radius: 50%; width: 20px; height: 20px; padding: 0; font-size: 11px; line-height: 1;
+            cursor: pointer; font-weight: 800; transition: all .2s;
+            display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .btn-clear-file:hover { background: var(--red); color: #fff; transform: scale(1.08); }
+        .btn-sm { padding: 6px 11px; border-radius: 9px; font-size: 11px; font-weight: 700; cursor: pointer; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; margin: 2px; transition: all .15s; }
+        .btn-sm:hover { transform: translateY(-1px); }
+        .btn-edit { background: var(--amber-bg); color: var(--amber); }
+        .btn-del { background: var(--red-bg); color: var(--red); }
+        .btn-card { background: var(--violet-bg); color: var(--violet); }
+        #app-container { display: none; max-width: 1440px; margin: 0 auto; }
+        header {
+            background: var(--surface); backdrop-filter: blur(18px); padding: 16px 22px;
+            border-radius: var(--radius-lg); display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid var(--glass-border); margin-bottom: 18px; flex-wrap: wrap; gap: 14px;
+            box-shadow: var(--shadow-soft); position: relative; z-index: 300;
+        }
+        .header-brand { display: flex; align-items: center; gap: 12px; }
+        .header-brand img { width: 48px; height: 48px; border-radius: 14px; object-fit: cover; border: 2px solid var(--primary-light); }
+        .header-brand h1 { font-size: 17px; letter-spacing: .02em; font-weight: 800; color: var(--ink); }
+        .header-brand p { font-size: 11px; color: var(--muted); font-weight: 600; margin-top: 2px; display: flex; align-items: center; gap: 6px; }
+        .customization-panel { background: #fff; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--line); font-size: 11px; font-weight: 700; color: var(--primary-dark); display: flex; gap: 8px; align-items: center; }
+        .settings-menu-wrap { position: relative; }
+        .settings-dropdown {
+            position: absolute; top: calc(100% + 8px); right: 0; z-index: 200;
+            background: #fff; border-radius: 16px; border: 1px solid var(--line);
+            box-shadow: var(--shadow-lift); padding: 10px; min-width: 220px;
+            display: flex; flex-direction: column; gap: 3px;
+        }
+        .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; font-size: 12px; font-weight: 700; color: var(--ink); }
+        .settings-link { color: var(--primary); cursor: pointer; text-decoration: underline; font-size: 11px; font-weight: 700; }
+        .settings-action {
+            background: none; border: none; text-align: left; padding: 9px 10px; border-radius: 10px;
+            font-size: 12px; font-weight: 700; color: var(--ink); cursor: pointer; transition: background .15s;
+            display: block; width: 100%; text-decoration: none;
+        }
+        .settings-action:hover { background: var(--bg-1); }
+        .settings-danger { color: var(--red); }
+        .settings-danger:hover { background: var(--red-bg); }
+        .settings-divider { height: 1px; background: var(--line); margin: 4px 2px; }
+        .account-tabs-card { background: var(--surface); backdrop-filter: blur(18px); padding: 16px 20px; border-radius: var(--radius-lg); border: 1px solid var(--glass-border); margin-bottom: 18px; box-shadow: var(--shadow-soft); }
+        .account-tabs-title { font-size: 11px; font-weight: 800; color: var(--primary-dark); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .account-tabs-container { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+        .account-tab-btn { background: #fff; border: 1.5px solid var(--line); color: var(--primary-dark); padding: 8px 16px; border-radius: 12px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all .2s ease; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+        .account-tab-btn:hover { border-color: var(--primary-light); }
+        .account-tab-btn.active { background: linear-gradient(135deg, var(--primary-light), var(--primary)); color: #fff; border-color: transparent; box-shadow: 0 6px 14px rgba(79,70,229,.3); }
+        .stats-grid { display: flex; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+        .stat-card { background: var(--surface); padding: 18px 20px; border-radius: var(--radius-lg); border: 1px solid var(--glass-border); flex: 1; min-width: 180px; transition: all .2s ease; box-shadow: var(--shadow-soft); cursor: pointer; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); }
+        .stat-card h3 { font-size: 26px; font-weight: 900; }
+        .stat-card p { font-size: 11px; color: var(--muted); font-weight: 700; margin-bottom: 6px; letter-spacing: .03em; text-transform: uppercase; }
+        .stat-card.alert-pulse h3 { position: relative; }
+        .pills-container { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; }
+        .pill-btn { background: #fff; border: 1.5px solid var(--line); color: var(--primary-dark); padding: 7px 15px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all .2s ease; }
+        .pill-btn:hover { border-color: var(--primary-light); }
+        .pill-btn.active { background: linear-gradient(135deg, var(--primary-light), var(--primary)); color: #fff; border-color: transparent; }
+        .card-box { background: var(--surface); backdrop-filter: blur(18px); padding: 22px; border-radius: var(--radius-lg); border: 1px solid var(--glass-border); margin-bottom: 18px; box-shadow: var(--shadow-soft); }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+        .field-group { display: flex; flex-direction: column; gap: 5px; }
+        .field-group label { font-size: 11px; font-weight: 700; color: #334155; text-transform: uppercase; letter-spacing: .02em; display: flex; justify-content: space-between; align-items: center; }
+        input, select, textarea {
+            background: #fff; border: 1.5px solid var(--line); padding: 10px 12px; border-radius: 12px;
+            font-size: 13px; outline: none; width: 100%; transition: all .15s ease; font-family: inherit; color: var(--ink);
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(99,102,241,.15); }
+        textarea { resize: vertical; min-height: 42px; }
+        input[type="file"] { border: 1.5px dashed var(--primary-light); background: var(--bg-1); cursor: pointer; padding: 8px; font-size: 12px; }
+        input[type="file"].drag-over { border-color: var(--green) !important; background: var(--green-bg) !important; transform: scale(1.01); }
+        input[type="file"].file-loaded { border-color: var(--green) !important; background: #ecfdf5 !important; border-style: solid; }
+        .date-input-wrap { position: relative; display: flex; align-items: center; }
+        .date-input-wrap input[type="text"] { padding-right: 35px; }
+        .date-picker-trigger { position: absolute; right: 10px; cursor: pointer; font-size: 15px; opacity: .65; pointer-events: none; }
+        .hidden-date-picker { position: absolute; right: 0; opacity: 0; width: 30px; height: 30px; cursor: pointer; z-index: 5; }
+        .table-container { overflow-x: auto; border-radius: 16px; border: 1px solid var(--line); background: #fff; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; min-width: 760px; }
+        th { background: var(--bg-1); padding: 12px 10px; color: var(--primary-dark); font-weight: 800; border-bottom: 2px solid var(--line); font-size: 11px; text-transform: uppercase; letter-spacing: .03em; }
+        td { padding: 10px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        tbody tr { transition: background .15s; }
+        tbody tr:hover { background: #f7f8ff; }
+        .emp-thumb { width: 38px; height: 38px; border-radius: 10px; object-fit: cover; border: 2px solid var(--line); }
+        .clickable-id { font-weight: 800; color: var(--primary); cursor: pointer; transition: color .15s; }
+        .clickable-id:hover { color: var(--primary-dark); text-decoration: underline; }
+        .clickable-row { cursor: pointer; }
+        .badge { display: inline-block; padding: 4px 9px; border-radius: 7px; font-size: 10px; font-weight: 800; letter-spacing: .01em; }
+        .badge-green { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-line); }
+        .badge-warning { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-line); }
+        .badge-critical { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-line); }
+        .badge-blue { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-line); }
+        .badge-purple { background: var(--violet-bg); color: var(--violet); border: 1px solid var(--violet-line); }
+        .doc-link { font-size: 11px; font-weight: 700; color: var(--primary); background: var(--bg-1); padding: 7px 12px; border-radius: 9px; text-decoration: none; cursor: pointer; display: inline-block; border: 1px solid var(--line); transition: all .15s; }
+        .doc-link:hover { background: var(--primary-light); color: #fff; }
+        .hidden { display: none !important; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(30, 27, 46, 0.55); backdrop-filter: blur(6px); justify-content: center; align-items: center; padding: 15px; }
+        .id-card-wrap { background: #fff; width: 100%; max-width: 340px; border-radius: 24px; padding: 0 0 22px; box-shadow: 0 25px 60px rgba(79,70,229,.35); text-align: center; border: 1px solid var(--line); position: relative; overflow: hidden; }
+        .id-card-header { background: linear-gradient(135deg, var(--primary-light), var(--primary) 55%, var(--violet)); color: white; padding: 22px 20px 46px; position: relative; }
+        .id-card-org-logo { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; border: 2px solid rgba(255,255,255,.85); background: #fff; margin-bottom: 8px; }
+        .id-card-org-name { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .03em; line-height: 1.3; }
+        .id-card-org-sub { font-size: 9px; opacity: .88; margin-top: 4px; letter-spacing: .1em; text-transform: uppercase; }
+        .id-card-photo { width: 92px; height: 92px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; box-shadow: 0 10px 22px rgba(0,0,0,.25); margin-top: -42px; position: relative; z-index: 2; background: #fff; }
+        .id-card-body { padding: 6px 22px 0; }
+        .id-card-info { font-size: 12px; text-align: left; line-height: 2; margin: 14px 0; background: var(--bg-1); border-radius: 12px; padding: 12px 14px; border: 1px solid var(--line); }
+        .id-card-info b { color: var(--primary-dark); }
+        #qrcode { display: flex; justify-content: center; margin-top: 6px; }
+        .detail-card-wrap {
+            background: #fff; width: 100%; max-width: 680px; max-height: 88vh; overflow-y: auto;
+            border-radius: var(--radius-lg); padding: 24px; box-shadow: 0 24px 50px rgba(0,0,0,.3);
+            border: 1px solid var(--line); position: relative; animation: popIn .25s ease-out;
+        }
+        @keyframes popIn { from { transform: scale(.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .detail-header { display: flex; align-items: center; gap: 14px; border-bottom: 2px solid var(--bg-1); padding-bottom: 16px; margin-bottom: 16px; }
+        .detail-header img { width: 68px; height: 68px; border-radius: 16px; object-fit: cover; border: 3px solid var(--primary-light); }
+        .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 15px; }
+        .detail-item { background: #f8f9ff; padding: 11px; border-radius: 11px; border: 1px solid var(--line); }
+        .detail-item span { display: block; font-size: 9px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 3px; letter-spacing: .03em; }
+        .detail-item p { font-size: 12.5px; font-weight: 700; color: var(--ink); word-break: break-word; }
+        .close-popup-btn { position: absolute; top: 15px; right: 15px; background: #f1f2fb; border: none; font-size: 18px; font-weight: bold; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; color: var(--muted); z-index: 10; transition: all .15s; }
+        .close-popup-btn:hover { background: #e2e4fa; color: var(--ink); }
+        .doc-viewer-wrap {
+            background: #1e1b2e; width: 100%; max-width: 850px; max-height: 88vh;
+            border-radius: 20px; padding: 20px; text-align: center; position: relative;
+            box-shadow: 0 30px 60px rgba(0,0,0,.5); border: 1px solid #372f52;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .footer-credits {
+            text-align: center; margin-top: 26px; padding: 12px;
+            background: var(--surface); backdrop-filter: blur(10px);
+            border-radius: 14px; border: 1px solid var(--glass-border);
+            font-size: 12px; font-weight: 700; color: var(--primary-dark);
+            display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap;
+        }
+        .ol-fullscreen-modal { padding: 0; }
+        .ol-fullscreen-wrap {
+            background: #fff; width: 100%; height: 100%; max-width: 100%; max-height: 100%;
+            position: relative; display: flex; flex-direction: column; overflow: hidden;
+        }
+        .ol-fullscreen-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 16px; background: var(--ink); flex-shrink: 0;
+        }
+        .ol-fullscreen-bar span { color: #fff; font-size: 13px; font-weight: 700; }
+        .ol-close-btn {
+            background: rgba(255,255,255,0.15); border: none; color: #fff; width: 32px; height: 32px;
+            border-radius: 50%; font-size: 16px; cursor: pointer; flex-shrink: 0;
+        }
+        .ol-close-btn:hover { background: rgba(255,255,255,0.28); }
+        #order-ledger-iframe { flex: 1; width: 100%; border: none; background: #EEF0FB; }
+        @media print {
+            body * { visibility: hidden; }
+            #printable-summary, #printable-summary * { visibility: visible; }
+            #printable-summary { position: absolute; left: 0; top: 0; width: 100%; padding: 20px; }
+        }
+        @media (max-width: 640px) {
+            header { flex-direction: column; align-items: stretch; }
+            .stats-grid { flex-direction: column; }
+        }
+    </style>
+</head>
+<body id="main-body">
+
+<div id="toast-stack"></div>
+
+<div id="login-container">
+    <div class="login-card">
+        <img id="login-logo-preview" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="logo-preview" alt="Logo">
+        <div class="auth-toggle">
+            <button id="btn-tab-login" class="active" data-tab="login">🔑 Sign In</button>
+            <button id="btn-tab-signup" data-tab="signup">✨ Register New Account</button>
+        </div>
+        <form id="login-form" style="display: flex; flex-direction: column; gap: 12px;" autocomplete="off">
+            <input type="text" id="login-email" placeholder="Username or Email Address" required autocomplete="off">
+            <input type="password" id="login-pass" placeholder="Password" required autocomplete="current-password">
+            <button type="submit" class="btn-stylish" style="width: 100%;">🚀 Login to Server</button>
+        </form>
+        <form id="signup-form" class="hidden" style="display: flex; flex-direction: column; gap: 12px;" autocomplete="off">
+            <input type="text" id="signup-project" placeholder="Company / Account Name (e.g. Al Majmaah)" required autocomplete="off">
+            <input type="email" id="signup-email" placeholder="Email Address" required autocomplete="off">
+            <input type="password" id="signup-pass" placeholder="Password (Min 6 chars)" required minlength="6" autocomplete="new-password">
+            <button type="submit" class="btn-stylish btn-success" style="width: 100%;">🏢 Register New Account</button>
+        </form>
+    </div>
+</div>
+<div id="app-container">
+    <header>
+        <div class="header-brand">
+            <img id="header-logo-preview" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Logo">
+            <div>
+                <h1 id="header-project-title">MAIN SERVER HR PORTAL</h1>
+                <p>Central Account System <span id="user-role-badge" class="badge badge-green">MASTER SERVER</span></p>
+            </div>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: center;">
+            <button id="btn-order-ledger" class="btn-stylish btn-warning">📦 Order Ledger</button>
+            <button id="btn-desig-modal" class="btn-stylish btn-purple">📊 Designation Breakdown</button>
+            <div class="customization-panel" data-guest-hide="true">
+                <span>📂 Excel:</span>
+                <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" style="display:none;">
+                <label for="excel-file-input" style="color: var(--primary); cursor: pointer; text-decoration: underline;">Import / Sync</label>
+            </div>
+            <div class="settings-menu-wrap">
+                <button type="button" id="btn-settings-toggle" class="btn-stylish btn-muted">⚙️ Settings</button>
+                <div id="settings-dropdown" class="settings-dropdown hidden">
+                    <div class="settings-row" data-guest-hide="true">
+                        <span>🖼️ Background</span>
+                        <input type="file" accept="image/*" style="display:none;" id="bg-input">
+                        <label for="bg-input" class="settings-link">Change</label>
+                    </div>
+                    <div class="settings-row" data-guest-hide="true">
+                        <span>🏢 Logo</span>
+                        <input type="file" accept="image/*" style="display:none;" id="header-logo-input">
+                        <label for="header-logo-input" class="settings-link">Change</label>
+                    </div>
+                    <div class="settings-divider"></div>
+                    <button type="button" id="btn-json-backup" class="settings-action">💾 JSON Backup</button>
+                    <input type="file" id="json-restore-input" accept=".json" style="display:none;">
+                    <label for="json-restore-input" class="settings-action" data-guest-hide="true" style="cursor:pointer;">📂 JSON Restore</label>
+                    <button type="button" id="btn-export-csv" class="settings-action">📥 Export CSV</button>
+                    <div class="settings-divider"></div>
+                    <button type="button" id="admin-reset-btn" class="settings-action settings-danger" data-guest-hide="true">🗑️ Reset Server</button>
+                </div>
+            </div>
+            <button id="btn-logout" class="btn-stylish btn-muted">🚪 Logout</button>
+        </div>
+    </header>
+
+    <div class="account-tabs-card">
+        <div class="account-tabs-title">
+            <span>🏢 Central Account Holder Server Tabs:</span>
+            <span id="account-holder-count" class="badge badge-purple">0 Accounts Active</span>
+        </div>
+        <div class="account-tabs-container" id="account-tabs-list"></div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card" data-filter="all"><p>TOTAL WORKFORCE</p><h3 id="stat-total" style="color: var(--primary);">0</h3></div>
+        <div class="stat-card" data-filter="Active"><p>ACTIVE STAFF 🟢</p><h3 id="stat-active" style="color: var(--green);">0</h3></div>
+        <div class="stat-card" id="stat-nat-card" title="Click to filter by nationality"><p>NATIONALITIES 🌍</p><h3 id="stat-nationalities" style="color: var(--violet);">0</h3></div>
+        <div class="stat-card" data-filter="alerts"><p>DOCUMENT ALERTS 🔍</p><h3 id="stat-alerts" style="color: var(--red);">0</h3></div>
+    </div>
+
+    <div class="card-box" id="employee-form-card" data-guest-hide="true">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+            <h2 id="form-title" style="font-size: 16px;">✨ Add New Employee Profile & Documents</h2>
+            <button type="button" id="btn-new-employee" class="btn-stylish" style="padding: 7px 15px; font-size: 12px; width: auto;">➕ Add New Employee</button>
+        </div>
+        <form id="employee-form" class="form-grid" autocomplete="off">
+            <input type="hidden" id="edit-doc-id" value="">
+            <div class="field-group">
+                <label>Employee Photo <button type="button" class="btn-clear-file" data-clear-key="photo" data-clear-input="photo" title="Remove attachment">✖</button></label>
+                <input type="file" id="photo" accept="image/*" data-key="photo">
+            </div>
+            <div class="field-group"><label>Employee ID *</label><input type="text" id="empId" placeholder="EMP-101" required autocomplete="off"></div>
+            <div class="field-group"><label>Full Name *</label><input type="text" id="empName" placeholder="Full Name" required autocomplete="off"></div>
+            <div class="field-group">
+                <label style="color: var(--primary);">Employment Status *</label>
+                <select id="empStatus" style="font-weight: 700; border-color: var(--primary-light);">
+                    <option value="Active">Active 🟢</option>
+                    <option value="On Leave">On Leave 🟠</option>
+                    <option value="Resigned/Terminated">Resigned / Terminated 🔴</option>
+                </select>
+            </div>
+            <div class="field-group">
+                <label>Nationality</label>
+                <select id="nationality">
+                    <option value="">Select Option</option>
+                    <option value="Pakistan">Pakistan</option>
+                    <option value="Bangladesh">Bangladesh</option>
+                    <option value="India">India</option>
+                    <option value="Egypt">Egypt</option>
+                    <option value="Uganda">Uganda</option>
+                    <option value="Kenya">Kenya</option>
+                    <option value="Saudi Arabia">Saudi Arabia</option>
+                    <option value="Sudan">Sudan</option>
+                    <option value="Philippines">Philippines</option>
+                    <option value="Nepal">Nepal</option>
+                    <option value="Other">Other (Enter Manually)</option>
+                </select>
+            </div>
+            <div id="custom-nationality-box" class="field-group hidden">
+                <label style="color: var(--primary);">Custom Nationality</label>
+                <input type="text" id="customNationality" placeholder="Type nationality..." autocomplete="off">
+            </div>
+            <div class="field-group">
+                <label>Designation</label>
+                <select id="designation">
+                    <option value="">Select Option</option>
+                    <option value="Male Nursing Staff">Male Nursing Staff</option>
+                    <option value="Female Nursing Staff">Female Nursing Staff</option>
+                    <option value="Project Manager">Project Manager</option>
+                    <option value="Co-Ordinator">Co-Ordinator</option>
+                    <option value="Male Patient Care">Male Patient Care</option>
+                    <option value="Female Patient Care">Female Patient Care</option>
+                    <option value="Male Cook">Male Cook</option>
+                    <option value="Male Kitchen Labour">Male Kitchen Labour</option>
+                    <option value="Female Kitchen Labour">Female Kitchen Labour</option>
+                    <option value="Female Cook">Female Cook</option>
+                    <option value="Barber">Barber</option>
+                    <option value="Hair Stylist">Hair Stylist</option>
+                    <option value="Nutritionist">Nutritionist</option>
+                    <option value="Driver">Driver</option>
+                    <option value="Vocational Female Trainer">Vocational Female Trainer</option>
+                    <option value="Vocational Male Trainer">Vocational Male Trainer</option>
+                    <option value="General Services Female Observer">General Services Female Observer</option>
+                    <option value="General Services Male Observer">General Services Male Observer</option>
+                    <option value="Male physiotherapist">Male physiotherapist</option>
+                    <option value="Oral & Dental health Male Therapist">Oral & Dental health Male Therapist</option>
+                    <option value="Other">Other (Enter Manually)</option>
+                </select>
+            </div>
+            <div id="custom-desig-box" class="field-group hidden">
+                <label style="color: var(--primary);">Custom Designation</label>
+                <input type="text" id="customDesignation" placeholder="Type custom designation..." autocomplete="off">
+            </div>
+            <div class="field-group"><label>Project / Site</label><input type="text" id="project" value="Main Site" autocomplete="off"></div>
+            <div class="field-group"><label>Mobile Number</label><input type="tel" id="mobile" placeholder="966XXXXXXXXX" autocomplete="off"></div>
+            <div class="field-group"><label>Iqama Number</label><input type="text" id="iqama" placeholder="Iqama No" autocomplete="off"></div>
+            <div class="field-group">
+                <label>Iqama Expiry Date</label>
+                <div class="date-input-wrap">
+                    <input type="text" id="iqamaExpiry" placeholder="YYYY-MM-DD" autocomplete="off">
+                    <span class="date-picker-trigger">📅</span>
+                    <input type="date" class="hidden-date-picker" data-sync="iqamaExpiry">
+                </div>
+            </div>
+            <div class="field-group">
+                <label style="color: var(--primary);">Iqama (Image / PDF) <button type="button" class="btn-clear-file" data-clear-key="iqamaPic" data-clear-input="iqamaPicInput" title="Remove attachment">✖</button></label>
+                <input type="file" id="iqamaPicInput" accept="image/*,application/pdf,.pdf" data-key="iqamaPic">
+            </div>
+            <div class="field-group"><label>Passport Number</label><input type="text" id="passport" placeholder="Passport No" autocomplete="off"></div>
+            <div class="field-group">
+                <label style="color: var(--primary);">Passport (Image / PDF) <button type="button" class="btn-clear-file" data-clear-key="passportPic" data-clear-input="passportPicInput" title="Remove attachment">✖</button></label>
+                <input type="file" id="passportPicInput" accept="image/*,application/pdf,.pdf" data-key="passportPic">
+            </div>
+            <div id="scfhs-box" class="field-group hidden">
+                <label style="color: var(--primary);">SCFHS Expiry (Medical)</label>
+                <div class="date-input-wrap">
+                    <input type="text" id="scfhsExpiry" placeholder="YYYY-MM-DD" autocomplete="off">
+                    <span class="date-picker-trigger">📅</span>
+                    <input type="date" class="hidden-date-picker" data-sync="scfhsExpiry">
+                </div>
+            </div>
+            <div id="scfhs-pic-box" class="field-group hidden">
+                <label style="color: var(--primary);">SCFHS Card <button type="button" class="btn-clear-file" data-clear-key="scfhsPic" data-clear-input="scfhsPicInput" title="Remove attachment">✖</button></label>
+                <input type="file" id="scfhsPicInput" accept="image/*,application/pdf,.pdf" data-key="scfhsPic">
+            </div>
+            <div class="field-group">
+                <label style="color: var(--primary);">Baladiya / Health Card <button type="button" class="btn-clear-file" data-clear-key="baladiyaPic" data-clear-input="baladiyaPicInput" title="Remove attachment">✖</button></label>
+                <input type="file" id="baladiyaPicInput" accept="image/*,application/pdf,.pdf" data-key="baladiyaPic">
+            </div>
+            <div class="field-group"><label>Salary (SAR)</label><input type="number" id="salary" placeholder="Salary" autocomplete="off"></div>
+            <div class="field-group"><label>Bank Name</label><input type="text" id="bank" placeholder="Bank Name" autocomplete="off"></div>
+            <div class="field-group" style="border-top: 1px dashed var(--primary-light); padding-top: 10px; margin-top: 5px;">
+                <label style="color: var(--primary);">Start Working Date</label>
+                <div class="date-input-wrap">
+                    <input type="text" id="startDate" placeholder="YYYY-MM-DD" autocomplete="off">
+                    <span class="date-picker-trigger">📅</span>
+                    <input type="date" class="hidden-date-picker" data-sync="startDate">
+                </div>
+            </div>
+            <div class="field-group" style="border-top: 1px dashed var(--primary-light); padding-top: 10px; margin-top: 5px;">
+                <label style="color: var(--red);">Last Working Date</label>
+                <div class="date-input-wrap">
+                    <input type="text" id="lastDate" placeholder="YYYY-MM-DD" autocomplete="off">
+                    <span class="date-picker-trigger">📅</span>
+                    <input type="date" class="hidden-date-picker" data-sync="lastDate">
+                </div>
+            </div>
+            <div class="field-group" style="grid-column: span 2;"><label style="color: var(--red);">Reason for Leaving</label><input type="text" id="leavingReason" placeholder="Reason for leaving / Termination details..." autocomplete="off"></div>
+            <div class="field-group">
+                <label style="color: var(--red);">Reason Paper <button type="button" class="btn-clear-file" data-clear-key="reasonPic" data-clear-input="reasonPicInput" title="Remove attachment">✖</button></label>
+                <input type="file" id="reasonPicInput" accept="image/*,application/pdf,.pdf" data-key="reasonPic">
+            </div>
+            <button type="submit" id="save-btn" class="btn-stylish btn-success" style="grid-column: 1 / -1; margin-top: 15px;">💾 Save Employee Record to Main Server Database</button>
+        </form>
+    </div>
+
+    <div class="card-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+            <h2 style="font-size: 16px; display:flex; align-items:center; gap:8px;" id="table-heading">
+                📋 Employee Directory
+                <span id="active-desig-filter-tag" class="badge badge-purple hidden" style="font-size:11px;">
+                    Filtered: <span id="active-desig-filter-name"></span>
+                    <b id="btn-clear-desig-filter" style="cursor:pointer; margin-left:6px; color:#fca5a5;">✖</b>
+                </span>
+            </h2>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <select id="nationality-filter-select" style="padding: 8px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; width: auto; border: 1.5px solid var(--line); color: var(--primary-dark);">
+                    <option value="ALL">🌍 All Nationalities</option>
+                </select>
+                <select id="sort-select" style="padding: 8px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; width: auto; border: 1.5px solid var(--line);">
+                    <option value="id-asc">Sort: Emp ID (Asc)</option>
+                    <option value="id-desc">Sort: Emp ID (Desc)</option>
+                    <option value="name-asc">Sort: Name (A-Z)</option>
+                    <option value="name-desc">Sort: Name (Z-A)</option>
+                    <option value="salary-high">Sort: Salary (High → Low)</option>
+                    <option value="salary-low">Sort: Salary (Low → High)</option>
+                    <option value="expiry-near">Sort: Nearest Expiry Date ⚠️</option>
+                </select>
+                <div style="display: flex; gap: 8px; align-items: center; max-width: 380px;">
+                    <input type="text" id="search-input" placeholder="🔍 Search ID, Designation, Name..." style="flex: 1;">
+                    <button id="btn-reset-search" class="btn-stylish btn-muted" style="padding: 8px 12px; font-size: 11px; width: auto;">Reset</button>
+                </div>
+            </div>
+        </div>
+        <div class="pills-container">
+            <button class="pill-btn active" id="pill-all" data-filter="all">🌐 All Employees</button>
+            <button class="pill-btn" id="pill-active" data-filter="Active">🟢 Active</button>
+            <button class="pill-btn" id="pill-leave" data-filter="On Leave">🟠 On Leave</button>
+            <button class="pill-btn" id="pill-resigned" data-filter="Resigned/Terminated">🔴 Resigned/Terminated</button>
+            <button class="pill-btn" id="pill-alerts" data-filter="alerts">⚠️ Expiry Alerts</button>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Photo</th><th>Emp ID (Click to View)</th><th>Account / Created By</th><th>Name</th>
+                        <th>Status</th><th>Designation</th><th>Project</th><th>Mobile</th><th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="employee-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer-credits"><span>💻 Created by <b>Muhammad Fawad Ali</b></span></div>
+</div>
+
+<div id="detail-modal" class="modal">
+    <div class="detail-card-wrap">
+        <button class="close-popup-btn" id="btn-close-detail">&times;</button>
+        <div id="printable-summary">
+            <div class="detail-header">
+                <img id="pop-photo" src="" alt="Photo">
+                <div>
+                    <h3 id="pop-name" style="font-size: 18px; color: var(--ink);">-</h3>
+                    <p id="pop-desig" style="color: var(--primary); font-size: 13px; font-weight: 700;">-</p>
+                    <div style="display:flex; gap:6px; margin-top:5px;">
+                        <span id="pop-id" class="badge badge-green">-</span>
+                        <span id="pop-status-badge" class="badge badge-blue">-</span>
+                    </div>
+                </div>
+            </div>
+            <div class="detail-grid">
+                <div class="detail-item" style="grid-column: span 2; background: var(--blue-bg); border-color: var(--blue-line);">
+                    <span style="color: var(--blue);">🏢 Account Holder / Submitted By</span>
+                    <p id="pop-account-owner" style="color: var(--primary); font-size: 13px; font-weight: 800;">-</p>
+                </div>
+                <div class="detail-item"><span>Nationality</span><p id="pop-nat">-</p></div>
+                <div class="detail-item"><span>Project / Site</span><p id="pop-project">-</p></div>
+                <div class="detail-item"><span>Mobile Number</span><p id="pop-mobile">-</p></div>
+                <div class="detail-item"><span>Salary & Bank</span><p id="pop-salary">-</p></div>
+                <div class="detail-item"><span>Start Working Date</span><p id="pop-start-date">-</p></div>
+                <div class="detail-item"><span>Last Working Date</span><p id="pop-last-date">-</p></div>
+                <div class="detail-item" style="grid-column: span 2;"><span>Reason for Leaving</span><p id="pop-reason">-</p></div>
+                <div class="detail-item"><span>Iqama Details</span><p id="pop-iqama">-</p></div>
+                <div class="detail-item"><span>Passport Details</span><p id="pop-passport">-</p></div>
+                <div class="detail-item"><span>SCFHS Expiry</span><p id="pop-scfhs">-</p></div>
+            </div>
+        </div>
+        <div style="background: #f6f7fd; padding: 14px; border-radius: 12px; border: 1px solid var(--line); margin-bottom: 15px;">
+            <span style="font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; display: block; margin-bottom: 8px;">Attached Documents</span>
+            <div id="pop-docs" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+        </div>
+        <button id="btn-print-summary" class="btn-stylish btn-success" style="width: 100%;">🖨️ Print Staff Summary (PDF)</button>
+    </div>
+</div>
+
+<div id="id-card-modal" class="modal">
+    <div class="id-card-wrap">
+        <div class="id-card-header">
+            <img id="card-org-logo" class="id-card-org-logo" src="" alt="Logo">
+            <div class="id-card-org-name">Al-Majmaa Rehabilitation Center</div>
+            <div class="id-card-org-sub">Official Identification Card</div>
+        </div>
+        <img id="card-photo" class="id-card-photo" src="" alt="Photo">
+        <div class="id-card-body">
+            <h4 id="card-name" style="color: var(--ink); font-size: 16px; margin-top: 4px;">-</h4>
+            <p id="card-desig" style="color: var(--primary); font-size: 12px; font-weight: 700;">-</p>
+            <div class="id-card-info">
+                <p><b>EMP ID:</b> <span id="card-id">-</span></p>
+                <p><b>Iqama No:</b> <span id="card-iqama">-</span></p>
+                <p><b>Mobile:</b> <span id="card-mobile">-</span></p>
+            </div>
+            <div id="qrcode"></div>
+            <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: center;">
+                <button id="btn-print-card" class="btn-stylish btn-success" style="padding: 7px 14px; font-size: 11px; width: auto;">🖨️ Print Card</button>
+                <button id="btn-close-idcard" class="btn-stylish btn-danger" style="padding: 7px 14px; font-size: 11px; width: auto;">❌ Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="doc-viewer-modal" class="modal" style="z-index: 1100;">
+    <div class="doc-viewer-wrap">
+        <button class="close-popup-btn" id="btn-close-docviewer" style="color: white; background: #372f52;">&times;</button>
+        <h3 id="doc-title" style="color: white; margin-bottom: 15px; font-size: 15px;">Document Viewer</h3>
+        <img id="doc-img-target" src="" alt="Document Preview" style="display:none; max-width: 100%; max-height: 70vh; border-radius: 10px; object-fit: contain;">
+        <iframe id="doc-iframe-target" src="" style="display:none; width: 100%; height: 68vh; border: none; border-radius: 10px; background: white;"></iframe>
+        <a id="doc-open-link" href="" target="_blank" class="btn-stylish btn-success" style="display:none; margin-top:12px; font-size: 12px; text-decoration: none;">↗️ Open / Download PDF in New Tab</a>
+    </div>
+</div>
+
+<div id="desig-modal" class="modal" style="z-index: 1050;">
+    <div class="detail-card-wrap" style="max-width: 820px;">
+        <button class="close-popup-btn" id="btn-close-desig">&times;</button>
+        <div style="border-bottom: 2px solid var(--bg-1); padding-bottom: 10px; margin-bottom: 15px;">
+            <h2 style="font-size: 18px; color: var(--primary-dark);">📊 Designation Breakdown</h2>
+            <p style="font-size: 11px; color: var(--muted); font-weight: 600;">Click on any designation to filter employees list.</p>
+            <span id="desig-total-badge" class="badge badge-blue" style="margin-top: 8px; font-size: 12px; display: inline-block;">Total Employees: 0</span>
+        </div>
+        <div class="table-container" style="max-height: 62vh; overflow-y: auto;">
+            <table>
+                <thead><tr><th>Designation (Click to Filter)</th><th>Total Staff</th></tr></thead>
+                <tbody id="desig-table-body"></tbody>
+                <tfoot><tr><td style="font-weight:900; color: var(--ink);">TOTAL</td><td id="desig-total-cell" style="font-weight:900; color: var(--ink);">0 Employees</td></tr></tfoot>
+            </table>
+        </div>
+        <div style="margin-top: 15px; text-align: right;">
+            <button id="btn-close-desig-2" class="btn-stylish btn-muted" style="padding: 7px 14px; width: auto;">Close</button>
+        </div>
+    </div>
+</div>
+
+<div id="order-ledger-modal" class="modal ol-fullscreen-modal">
+    <div class="ol-fullscreen-wrap">
+        <div class="ol-fullscreen-bar">
+            <span>📦 Order Ledger — Afras Trading &amp; Co.</span>
+            <button class="ol-close-btn" id="close-order-ledger" title="Close">✕</button>
+        </div>
+        <iframe id="order-ledger-iframe" src="" title="Order Ledger"></iframe>
+    </div>
+</div>
+<script>
+    function getCurrentFormattedDateTime() {
+        const now = new Date();
+        const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
+        return now.toLocaleString('en-GB', options);
+    }
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+    function showToast(message, type = 'info') {
+        const stack = document.getElementById('toast-stack');
+        const el = document.createElement('div');
+        el.className = 'toast' + (type === 'success' ? ' success' : type === 'error' ? ' error' : '');
+        el.textContent = message;
+        stack.appendChild(el);
+        setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(() => el.remove(), 300); }, 3200);
+    }
+    function compressFile(file, maxDim = 1200, quality = 0.72) {
+        return new Promise((resolve, reject) => {
+            if (!file) return resolve('');
+            if (!file.type || !file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = new Image();
+                img.onload = function () {
+                    let w = img.width, h = img.height;
+                    if (w > maxDim || h > maxDim) {
+                        const ratio = Math.min(maxDim / w, maxDim / h);
+                        w = Math.round(w * ratio);
+                        h = Math.round(h * ratio);
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, w, h);
+                    ctx.drawImage(img, 0, 0, w, h);
+                    resolve(canvas.toDataURL('image/jpeg', quality));
+                };
+                img.onerror = () => resolve(e.target.result);
+                img.src = e.target.result;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+    function normalizeId(id) { return String(id || '').trim().toLowerCase(); }
+</script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, writeBatch, getDocs, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC33ueoEDhQ-5vGw56KqBWXb1T6TUqBOzc",
+        authDomain: "al-majmaa-hr.firebaseapp.com",
+        projectId: "al-majmaa-hr",
+        storageBucket: "al-majmaa-hr.firebasestorage.app",
+        messagingSenderId: "584095323914",
+        appId: "1:584095323914:web:4902dbe1f0c8792ef50cf3",
+        measurementId: "G-MHYJFRNMZ8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    setPersistence(auth, browserLocalPersistence).catch(() => {});
+
+    window.employees = [];
+    window.accountTabs = [];
+    window.selectedAccountFilter = 'ALL';
+    window.selectedNationalityFilter = 'ALL';
+    window.currentTenantUser = null;
+    window.tenantProjectName = "Main Server HR Portal";
+    window.isGuestUser = false;
+    window.currentFiles = { photo: "", iqamaPic: "", passportPic: "", scfhsPic: "", baladiyaPic: "", reasonPic: "" };
+
+    let masterUnsubscribe = null;
+
+    const savedAdminSession = localStorage.getItem('al_majmaa_admin_session');
+    const savedGuestSession = localStorage.getItem('al_majmaa_guest_session');
+    if (savedAdminSession === 'true') {
+        window.currentTenantUser = { uid: "master_admin_id", email: "admin@almajmaa.com" };
+        window.tenantProjectName = "Al Majmaa Server Admin";
+        window.isGuestUser = false;
+        document.getElementById('header-project-title').innerText = "MAIN SERVER HR PORTAL (ADMIN)";
+        listenToEmployeesCollection();
+        showDashboard();
+    } else if (savedGuestSession === 'true') {
+        window.currentTenantUser = { uid: "guest_viewer_id", email: "guest@almajmaa.com" };
+        window.tenantProjectName = "Guest (Read-Only)";
+        window.isGuestUser = true;
+        document.getElementById('header-project-title').innerText = "MAIN SERVER HR PORTAL (GUEST — READ-ONLY)";
+        listenToEmployeesCollection();
+        showDashboard();
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            window.currentTenantUser = user;
+            window.isGuestUser = false;
+            localStorage.setItem('al_majmaa_admin_session', 'false');
+            localStorage.removeItem('al_majmaa_guest_session');
+            const userDoc = await getDoc(doc(db, "tenants", user.uid));
+            window.tenantProjectName = userDoc.exists() ? (userDoc.data().projectName || user.email) : user.email.split('@')[0];
+            document.getElementById('header-project-title').innerText = "MAIN SERVER HR PORTAL";
+            listenToEmployeesCollection();
+            showDashboard();
+        } else if (localStorage.getItem('al_majmaa_admin_session') !== 'true' && localStorage.getItem('al_majmaa_guest_session') !== 'true') {
+            document.getElementById('app-container').style.display = 'none';
+            document.getElementById('login-container').style.display = 'flex';
+        }
+    });
+
+    function listenToEmployeesCollection() {
+        const masterCollection = collection(db, "employees_v2");
+        if (masterUnsubscribe) masterUnsubscribe();
+        masterUnsubscribe = onSnapshot(masterCollection, (snapshot) => {
+            window.employees = [];
+            const accountsMap = new Map();
+            snapshot.forEach(docSnap => {
+                const data = docSnap.data();
+                window.employees.push({ firestoreId: docSnap.id, ...data });
+                const accountKey = data.creatorEmail || 'Unknown Account';
+                const proj = data.projectName || accountKey;
+                if (!accountsMap.has(accountKey)) accountsMap.set(accountKey, { email: accountKey, projectName: proj, count: 1 });
+                else accountsMap.get(accountKey).count++;
+            });
+            window.accountTabs = Array.from(accountsMap.values());
+            window.renderAccountHolderTabs();
+            window.updateNationalityDropdownOptions();
+            window.renderData();
+        }, (err) => {
+            showToast('⚠️ Server sync error: ' + err.message, 'error');
+        });
+    }
+
+    window.handleAuthSignUp = async function (e) {
+        e.preventDefault();
+        const project = document.getElementById('signup-project').value.trim();
+        const email = document.getElementById('signup-email').value.trim();
+        const pass = document.getElementById('signup-pass').value.trim();
+        try {
+            const userCred = await createUserWithEmailAndPassword(auth, email, pass);
+            await setDoc(doc(db, "tenants", userCred.user.uid), { projectName: project, email: email, createdAt: new Date().toISOString() });
+            showToast(`🎉 Account '${project}' registered successfully!`, 'success');
+        } catch (err) {
+            showToast("❌ Registration Error: " + err.message, 'error');
+        }
+    };
+
+    window.handleAuthLogin = async function (e) {
+        e.preventDefault();
+        const inputUser = document.getElementById('login-email').value.trim();
+        const inputPass = document.getElementById('login-pass').value.trim();
+
+        if ((inputUser.toLowerCase() === "admin") && inputPass === "Almajmaa123") {
+            localStorage.setItem('al_majmaa_admin_session', 'true');
+            localStorage.removeItem('al_majmaa_guest_session');
+            window.currentTenantUser = { uid: "master_admin_id", email: "admin@almajmaa.com" };
+            window.tenantProjectName = "Al Majmaa Server Admin";
+            window.isGuestUser = false;
+            document.getElementById('header-project-title').innerText = "MAIN SERVER HR PORTAL (ADMIN)";
+            listenToEmployeesCollection();
+            showDashboard();
+            showToast("🎉 Welcome Admin! Server login successful.", 'success');
+            return;
+        }
+        if ((inputUser.toLowerCase() === "guest") && inputPass === "Guest123") {
+            localStorage.setItem('al_majmaa_guest_session', 'true');
+            localStorage.removeItem('al_majmaa_admin_session');
+            window.currentTenantUser = { uid: "guest_viewer_id", email: "guest@almajmaa.com" };
+            window.tenantProjectName = "Guest (Read-Only)";
+            window.isGuestUser = true;
+            document.getElementById('header-project-title').innerText = "MAIN SERVER HR PORTAL (GUEST — READ-ONLY)";
+            listenToEmployeesCollection();
+            showDashboard();
+            showToast("👋 Welcome Guest! You have read-only, view & download access.", 'success');
+            return;
+        }
+        try {
+            await signInWithEmailAndPassword(auth, inputUser, inputPass);
+        } catch (err) {
+            showToast("❌ Login Failed: Invalid Credentials!", 'error');
+        }
+    };
+
+    window.handleLogout = function () {
+        localStorage.removeItem('al_majmaa_admin_session');
+        localStorage.removeItem('al_majmaa_guest_session');
+        window.currentTenantUser = null;
+        window.isGuestUser = false;
+        signOut(auth).catch(() => {});
+        document.getElementById('app-container').style.display = 'none';
+        document.getElementById('login-container').style.display = 'flex';
+    };
+
+    window.renderAccountHolderTabs = function () {
+        const tabsList = document.getElementById('account-tabs-list');
+        const countLabel = document.getElementById('account-holder-count');
+        if (!tabsList) return;
+        tabsList.innerHTML = '';
+        countLabel.innerText = `${window.accountTabs.length} Accounts Registered`;
+        const allBtn = document.createElement('button');
+        allBtn.className = 'account-tab-btn' + (window.selectedAccountFilter === 'ALL' ? ' active' : '');
+        allBtn.dataset.email = 'ALL';
+        allBtn.textContent = `🌐 All Accounts (${window.employees.length})`;
+        tabsList.appendChild(allBtn);
+        window.accountTabs.forEach(acc => {
+            const btn = document.createElement('button');
+            btn.className = 'account-tab-btn' + (window.selectedAccountFilter === acc.email ? ' active' : '');
+            btn.dataset.email = acc.email;
+            btn.textContent = `👤 ${acc.projectName} (${acc.count})`;
+            tabsList.appendChild(btn);
+        });
+    };
+
+    window.selectAccountFilter = function (accountEmail) {
+        window.selectedAccountFilter = accountEmail;
+        window.renderAccountHolderTabs();
+        window.renderData();
+    };
+
+    document.getElementById('employee-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        if (!window.currentTenantUser) return showToast("Please log in again!", 'error');
+        if (window.isGuestUser) return showToast("👀 Guest access is read-only.", 'error');
+
+        const editDocId = document.getElementById('edit-doc-id').value;
+        const empIdVal = document.getElementById('empId').value.trim();
+
+        const duplicate = window.employees.find(emp => normalizeId(emp.id) === normalizeId(empIdVal) && emp.firestoreId !== editDocId);
+        if (duplicate) return showToast(`⚠️ Employee with ID (${empIdVal}) already exists! Duplicate entry prohibited.`, 'error');
+
+        const defaultAvatar = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+        let finalNationality = document.getElementById('nationality').value;
+        if (finalNationality === 'Other') finalNationality = document.getElementById('customNationality').value || 'Other';
+        let finalDesignation = document.getElementById('designation').value;
+        if (finalDesignation === 'Other') finalDesignation = document.getElementById('customDesignation').value || 'Other';
+
+        let existingEmp = window.employees.find(emp => emp.firestoreId === editDocId) || {};
+        const uploadTime = existingEmp.uploadedAt || getCurrentFormattedDateTime();
+
+        const newEmp = {
+            creatorUid: window.currentTenantUser.uid,
+            creatorEmail: window.currentTenantUser.email,
+            projectName: window.tenantProjectName,
+            uploadedAt: uploadTime,
+            status: document.getElementById('empStatus').value || 'Active',
+            photo: window.currentFiles.photo || defaultAvatar,
+            iqamaPic: window.currentFiles.iqamaPic || "",
+            passportPic: window.currentFiles.passportPic || "",
+            scfhsPic: window.currentFiles.scfhsPic || "",
+            baladiyaPic: window.currentFiles.baladiyaPic || "",
+            reasonPic: window.currentFiles.reasonPic || "",
+            id: empIdVal,
+            name: document.getElementById('empName').value || 'N/A',
+            nationality: finalNationality || 'N/A',
+            designation: finalDesignation || 'N/A',
+            project: document.getElementById('project').value || 'N/A',
+            mobile: document.getElementById('mobile').value || 'N/A',
+            startDate: formatDateStandard(document.getElementById('startDate').value),
+            lastDate: formatDateStandard(document.getElementById('lastDate').value),
+            leavingReason: document.getElementById('leavingReason').value || '',
+            iqama: document.getElementById('iqama').value || 'N/A',
+            iqamaExp: formatDateStandard(document.getElementById('iqamaExpiry').value),
+            passport: document.getElementById('passport').value || 'N/A',
+            scfhsExp: formatDateStandard(document.getElementById('scfhsExpiry').value),
+            salary: parseFloat(document.getElementById('salary').value) || 0,
+            bank: document.getElementById('bank').value || 'N/A'
+        };
+
+        const masterColl = collection(db, "employees_v2");
+        const saveBtn = document.getElementById('save-btn');
+        saveBtn.disabled = true; saveBtn.style.opacity = '0.7';
+
+        try {
+            if (editDocId) {
+                await updateDoc(doc(db, "employees_v2", editDocId), newEmp);
+                showToast("✅ Employee record updated on Main Server!", 'success');
+            } else {
+                await addDoc(masterColl, newEmp);
+                showToast("✅ New employee saved to Main Server successfully!", 'success');
+            }
+            window.resetFormState();
+        } catch (err) {
+            showToast("❌ Error saving data: " + err.message, 'error');
+        } finally {
+            saveBtn.disabled = false; saveBtn.style.opacity = '1';
+        }
+    });
+
+    window.deleteEmployee = async function (firestoreId) {
+        if (window.isGuestUser) return showToast("👀 Guest access is read-only.", 'error');
+        if (confirm("Are you sure you want to delete this employee from Main Server?")) {
+            try { await deleteDoc(doc(db, "employees_v2", firestoreId)); showToast("🗑️ Employee deleted.", 'success'); }
+            catch (e) { showToast("Error: " + e.message, 'error'); }
+        }
+    };
+
+    window.clearAllData = async function () {
+        if (window.isGuestUser) return showToast("👀 Guest access is read-only.", 'error');
+        if (confirm("⚠️ WARNING: Permanently delete ALL employee records from Main Server?")) {
+            try {
+                const masterColl = collection(db, "employees_v2");
+                const snapshot = await getDocs(masterColl);
+                const batch = writeBatch(db);
+                snapshot.forEach(docSnap => batch.delete(docSnap.ref));
+                await batch.commit();
+                showToast("All data cleared successfully!", 'success');
+            } catch (e) { showToast("Error: " + e.message, 'error'); }
+        }
+    };
+
+    window.exportJSONBackup = function () {
+        if (!window.employees || window.employees.length === 0) return showToast('No employee data to backup!', 'error');
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.employees, null, 2));
+        const dlAnchor = document.createElement('a');
+        dlAnchor.setAttribute("href", dataStr);
+        dlAnchor.setAttribute("download", `MainServer_HR_Backup_${new Date().toISOString().slice(0, 10)}.json`);
+        dlAnchor.click();
+    };
+
+    window.restoreJSONBackup = async function (event) {
+        const file = event.target.files[0];
+        if (!file || !window.currentTenantUser) return;
+        if (window.isGuestUser) return showToast("👀 Guest access is read-only.", 'error');
+        const reader = new FileReader();
+        reader.onload = async function (e) {
+            try {
+                const importedList = JSON.parse(e.target.result);
+                if (!Array.isArray(importedList)) return showToast("Invalid JSON format!", 'error');
+                let addedCount = 0, updatedCount = 0, skippedCount = 0;
+                for (let item of importedList) {
+                    const itemId = normalizeId(item.id);
+                    if (!itemId) { skippedCount++; continue; }
+                    delete item.firestoreId;
+                    item.creatorUid = window.currentTenantUser.uid;
+                    item.creatorEmail = window.currentTenantUser.email;
+                    item.projectName = window.tenantProjectName;
+                    const existingEmp = window.employees.find(emp => normalizeId(emp.id) === itemId);
+                    if (existingEmp) {
+                        await updateDoc(doc(db, "employees_v2", existingEmp.firestoreId), item);
+                        updatedCount++;
+                    } else {
+                        await addDoc(collection(db, "employees_v2"), item);
+                        addedCount++;
+                    }
+                }
+                showToast(`🎉 Restore complete — Added: ${addedCount}, Updated: ${updatedCount}, Skipped (no ID): ${skippedCount}`, 'success');
+            } catch (err) {
+                showToast("❌ Backup Restore Error: " + err.message, 'error');
+            }
+            event.target.value = '';
+        };
+        reader.readAsText(file);
+    };
+
+    window.importFromExcel = function (event) {
+        const file = event.target ? event.target.files[0] : event;
+        if (!file || !window.currentTenantUser) return;
+        if (window.isGuestUser) return showToast("👀 Guest access is read-only.", 'error');
+        const reader = new FileReader();
+        reader.onload = async function (e) {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                const excelData = XLSX.utils.sheet_to_json(worksheet);
+                if (!excelData || excelData.length === 0) return showToast("⚠️ Excel sheet is empty!", 'error');
+                let addedCount = 0, updatedCount = 0, skippedCount = 0;
+                const seenThisBatch = new Set();
+                const batchUploadTime = getCurrentFormattedDateTime();
+                const masterColl = collection(db, "employees_v2");
+                for (let row of excelData) {
+                    const defaultAvatar = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+                    const rawId = row["ID"] || row["Emp ID"] || row["Employee ID"] || "";
+                    const id = String(rawId).trim();
+                    if (!id) { skippedCount++; continue; }
+                    const normId = normalizeId(id);
+                    if (seenThisBatch.has(normId)) { skippedCount++; continue; }
+                    seenThisBatch.add(normId);
+                    const existingEmp = (window.employees || []).find(emp => normalizeId(emp.id) === normId);
+                    const empPayload = {
+                        creatorUid: window.currentTenantUser.uid,
+                        creatorEmail: window.currentTenantUser.email,
+                        projectName: window.tenantProjectName,
+                        id: id,
+                        name: String(row["Name"] || row["Full Name"] || "N/A").trim(),
+                        status: String(row["Status"] || existingEmp?.status || "Active"),
+                        nationality: String(row["Nationality"] || existingEmp?.nationality || "Other"),
+                        designation: String(row["Designation"] || existingEmp?.designation || "Other"),
+                        project: String(row["Project"] || existingEmp?.project || "Main Site"),
+                        mobile: String(row["Mobile"] || row["Mobile Number"] || existingEmp?.mobile || ""),
+                        startDate: formatDateStandard(row["Start Date"] || row["StartDate"] || existingEmp?.startDate || ""),
+                        lastDate: formatDateStandard(row["Last Date"] || row["LastDate"] || existingEmp?.lastDate || ""),
+                        leavingReason: String(row["Leaving Reason"] || existingEmp?.leavingReason || ""),
+                        iqama: String(row["Iqama"] || row["Iqama Number"] || existingEmp?.iqama || ""),
+                        iqamaExp: formatDateStandard(row["Iqama Expiry"] || row["IqamaExp"] || existingEmp?.iqamaExp || ""),
+                        passport: String(row["Passport"] || row["Passport Number"] || existingEmp?.passport || ""),
+                        scfhsExp: formatDateStandard(row["SCFHS Expiry"] || row["SCFHS"] || existingEmp?.scfhsExp || ""),
+                        salary: parseFloat(row["Salary"]) || existingEmp?.salary || 0,
+                        bank: String(row["Bank"] || row["Bank Name"] || existingEmp?.bank || "N/A")
+                    };
+                    if (existingEmp) {
+                        await updateDoc(doc(db, "employees_v2", existingEmp.firestoreId), empPayload);
+                        updatedCount++;
+                    } else {
+                        await addDoc(masterColl, {
+                            ...empPayload,
+                            uploadedAt: batchUploadTime,
+                            photo: defaultAvatar,
+                            iqamaPic: "", passportPic: "", scfhsPic: "", baladiyaPic: "", reasonPic: ""
+                        });
+                        addedCount++;
+                    }
+                }
+                showToast(`🔄 Excel Sync Complete! Added: ${addedCount}, Updated: ${updatedCount}, Skipped duplicates/blank IDs: ${skippedCount}`, 'success');
+            } catch (err) {
+                showToast("❌ Excel Upload Error: " + err.message, 'error');
+            }
+            if (event.target) event.target.value = '';
+        };
+        reader.readAsArrayBuffer(file);
+    };
+</script>
+<script>
+    let currentPillFilter = 'all';
+    let lastFocusedFileInput = null;
+    window.activeDesignationFilter = null;
+
+    window.onload = function () {
+        loadSavedCustomizations();
+        initDragDropAndPaste();
+        bindStaticEvents();
+    };
+
+    function bindStaticEvents() {
+        document.getElementById('btn-tab-login').addEventListener('click', () => switchAuthTab('login'));
+        document.getElementById('btn-tab-signup').addEventListener('click', () => switchAuthTab('signup'));
+        document.getElementById('login-form').addEventListener('submit', e => window.handleAuthLogin(e));
+        document.getElementById('signup-form').addEventListener('submit', e => window.handleAuthSignUp(e));
+
+        document.getElementById('btn-desig-modal').addEventListener('click', openDesignationModal);
+        document.getElementById('btn-close-desig').addEventListener('click', closeDesignationModal);
+        document.getElementById('btn-close-desig-2').addEventListener('click', closeDesignationModal);
+
+        document.getElementById('btn-order-ledger').addEventListener('click', openOrderLedger);
+        document.getElementById('close-order-ledger').addEventListener('click', closeOrderLedger);
+
+        document.getElementById('btn-settings-toggle').addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('settings-dropdown').classList.toggle('hidden');
+        });
+        document.getElementById('settings-dropdown').addEventListener('click', e => e.stopPropagation());
+        document.addEventListener('click', () => {
+            document.getElementById('settings-dropdown').classList.add('hidden');
+        });
+
+        document.getElementById('bg-input').addEventListener('change', uploadCustomBackground);
+        document.getElementById('header-logo-input').addEventListener('change', uploadSystemLogo);
+        document.getElementById('excel-file-input').addEventListener('change', e => window.importFromExcel(e));
+        document.getElementById('json-restore-input').addEventListener('change', e => window.restoreJSONBackup(e));
+
+        document.getElementById('btn-json-backup').addEventListener('click', () => window.exportJSONBackup());
+        document.getElementById('btn-export-csv').addEventListener('click', exportToCSV);
+        document.getElementById('admin-reset-btn').addEventListener('click', () => window.clearAllData());
+        document.getElementById('btn-logout').addEventListener('click', () => window.handleLogout());
+
+        document.getElementById('btn-new-employee').addEventListener('click', resetFormState);
+        document.getElementById('nationality').addEventListener('change', handleNationalityChange);
+        document.getElementById('designation').addEventListener('change', handleDesignationChange);
+
+        document.querySelectorAll('.btn-clear-file').forEach(btn => {
+            btn.addEventListener('click', () => clearSelectedFile(btn.dataset.clearKey, btn.dataset.clearInput));
+        });
+        document.querySelectorAll('.hidden-date-picker').forEach(inp => {
+            inp.addEventListener('change', () => syncDatePicker(inp.dataset.sync, inp.value));
+        });
+
+        document.getElementById('nationality-filter-select').addEventListener('change', e => handleNationalityFilterChange(e.target.value));
+        document.getElementById('sort-select').addEventListener('change', renderData);
+        document.getElementById('search-input').addEventListener('keyup', renderData);
+        document.getElementById('btn-reset-search').addEventListener('click', resetSearchFilter);
+
+        document.querySelectorAll('.stat-card[data-filter]').forEach(card => {
+            card.addEventListener('click', () => setPillFilter(card.dataset.filter));
+        });
+        document.getElementById('stat-nat-card').addEventListener('click', focusNationalityFilter);
+
+        document.querySelectorAll('.pill-btn[data-filter]').forEach(btn => {
+            btn.addEventListener('click', () => setPillFilter(btn.dataset.filter));
+        });
+        document.getElementById('btn-clear-desig-filter').addEventListener('click', clearDesignationFilter);
+
+        document.getElementById('btn-close-detail').addEventListener('click', closeDetailModal);
+        document.getElementById('btn-print-summary').addEventListener('click', () => window.print());
+        document.getElementById('btn-close-idcard').addEventListener('click', closeModal);
+        document.getElementById('btn-print-card').addEventListener('click', () => window.print());
+        document.getElementById('btn-close-docviewer').addEventListener('click', closeDocViewer);
+
+        document.getElementById('employee-table-body').addEventListener('click', e => {
+            const t = e.target.closest('[data-action]');
+            if (!t) return;
+            const action = t.dataset.action;
+            if (action === 'view') openDetailModal(t.dataset.id);
+            else if (action === 'edit') editEmployee(t.dataset.id);
+            else if (action === 'delete') window.deleteEmployee(t.dataset.id);
+            else if (action === 'card') openIDCard(t.dataset.id);
+        });
+
+        document.getElementById('account-tabs-list').addEventListener('click', e => {
+            const t = e.target.closest('.account-tab-btn');
+            if (t) window.selectAccountFilter(t.dataset.email);
+        });
+
+        document.getElementById('desig-table-body').addEventListener('click', e => {
+            const t = e.target.closest('[data-desig]');
+            if (t) filterByDesignation(t.dataset.desig);
+        });
+
+        window.addEventListener('click', function (event) {
+            if (event.target === document.getElementById('detail-modal')) closeDetailModal();
+            if (event.target === document.getElementById('id-card-modal')) closeModal();
+            if (event.target === document.getElementById('doc-viewer-modal')) closeDocViewer();
+            if (event.target === document.getElementById('desig-modal')) closeDesignationModal();
+            if (event.target === document.getElementById('order-ledger-modal')) closeOrderLedger();
+        });
+    }
+
+    function switchAuthTab(tab) {
+        document.getElementById('btn-tab-login').classList.toggle('active', tab === 'login');
+        document.getElementById('btn-tab-signup').classList.toggle('active', tab === 'signup');
+        document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
+        document.getElementById('signup-form').classList.toggle('hidden', tab !== 'signup');
+    }
+
+    function showDashboard() {
+        document.getElementById('login-container').style.display = 'none';
+        document.getElementById('app-container').style.display = 'block';
+        applyRoleRestrictions();
+        renderData();
+    }
+
+    function applyRoleRestrictions() {
+        const guest = !!window.isGuestUser;
+        document.querySelectorAll('[data-guest-hide]').forEach(el => {
+            el.style.display = guest ? 'none' : '';
+        });
+    }
+
+    function openOrderLedger() {
+        const iframe = document.getElementById('order-ledger-iframe');
+        if (!iframe.src) iframe.src = 'order-ledger.html';
+        document.getElementById('order-ledger-modal').style.display = 'flex';
+    }
+    function closeOrderLedger() {
+        document.getElementById('order-ledger-modal').style.display = 'none';
+    }
+
+    function initDragDropAndPaste() {
+        const fileInputs = document.querySelectorAll('input[type="file"][data-key]');
+        fileInputs.forEach(input => {
+            input.addEventListener('focus', () => lastFocusedFileInput = input);
+            input.addEventListener('click', () => lastFocusedFileInput = input);
+            input.addEventListener('change', e => { if (e.target.files[0]) processFile(e.target.files[0], input); });
+            input.addEventListener('dragover', (e) => { e.preventDefault(); input.classList.add('drag-over'); });
+            input.addEventListener('dragleave', () => input.classList.remove('drag-over'));
+            input.addEventListener('drop', (e) => {
+                e.preventDefault();
+                input.classList.remove('drag-over');
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0], input);
+            });
+        });
+        document.addEventListener('paste', (e) => {
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            let file = null;
+            for (let item of items) {
+                if (item.type.indexOf('image') !== -1 || item.type === 'application/pdf') { file = item.getAsFile(); break; }
+            }
+            if (file) {
+                let targetInput = lastFocusedFileInput || document.getElementById('photo');
+                if (targetInput) processFile(file, targetInput);
+            }
+        });
+    }
+
+    async function processFile(file, inputElem) {
+        const key = inputElem.getAttribute('data-key');
+        try {
+            const compressed = await compressFile(file);
+            if (key && window.currentFiles) {
+                window.currentFiles[key] = compressed;
+                inputElem.classList.add('file-loaded');
+            }
+        } catch (err) {
+            showToast('❌ Could not process file: ' + err.message, 'error');
+        }
+    }
+
+    function clearSelectedFile(key, inputId) {
+        window.currentFiles[key] = "";
+        const inputElem = document.getElementById(inputId);
+        if (inputElem) { inputElem.value = ""; inputElem.classList.remove('file-loaded'); }
+        showToast('❌ Attached file removed', 'info');
+    }
+
+    function syncDatePicker(inputId, selectedVal) { document.getElementById(inputId).value = selectedVal; }
+
+    function formatDateStandard(dateStr) {
+        if (!dateStr) return '';
+        dateStr = String(dateStr).trim();
+        if (dateStr.includes('/')) {
+            const parts = dateStr.split('/');
+            if (parts.length === 3) {
+                if (parts[0].length === 4) return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+                return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+            }
+        }
+        return dateStr;
+    }
+
+    function resetFormState() {
+        document.getElementById('employee-form').reset();
+        document.querySelectorAll('input[type="file"]').forEach(i => i.classList.remove('file-loaded'));
+        document.getElementById('edit-doc-id').value = "";
+        document.getElementById('project').value = "Main Site";
+        window.currentFiles = { photo: "", iqamaPic: "", passportPic: "", scfhsPic: "", baladiyaPic: "", reasonPic: "" };
+        document.getElementById('form-title').innerText = "✨ Add New Employee Profile & Documents";
+        document.getElementById('scfhs-box').classList.add('hidden');
+        document.getElementById('scfhs-pic-box').classList.add('hidden');
+        document.getElementById('custom-desig-box').classList.add('hidden');
+        document.getElementById('custom-nationality-box').classList.add('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function handleNationalityChange() {
+        const nat = document.getElementById('nationality').value;
+        document.getElementById('custom-nationality-box').classList.toggle('hidden', nat !== 'Other');
+    }
+
+    function handleDesignationChange() {
+        const desig = document.getElementById('designation').value;
+        const isNursing = desig.includes('Nursing Staff');
+        document.getElementById('scfhs-box').classList.toggle('hidden', !isNursing);
+        document.getElementById('scfhs-pic-box').classList.toggle('hidden', !isNursing);
+        document.getElementById('custom-desig-box').classList.toggle('hidden', desig !== 'Other');
+    }
+
+    function checkExpiryStatus(dateStr) {
+        if (!dateStr) return { badge: 'N/A', class: 'badge-blue', level: 'valid', days: 999 };
+        const parsed = new Date(dateStr);
+        if (isNaN(parsed.getTime())) return { badge: 'N/A', class: 'badge-blue', level: 'valid', days: 999 };
+        const diff = Math.ceil((parsed - new Date()) / (1000 * 60 * 60 * 24));
+        if (diff <= 15) return { badge: `${dateStr} 🔴 (<15d)`, class: 'badge-critical', level: 'critical', days: diff };
+        if (diff <= 30) return { badge: `${dateStr} 🟠 (<30d)`, class: 'badge-warning', level: 'warning', days: diff };
+        return { badge: `${dateStr} 🟢`, class: 'badge-green', level: 'valid', days: diff };
+    }
+
+    function setPillFilter(filterType) {
+        currentPillFilter = filterType;
+        window.activeDesignationFilter = null;
+        document.getElementById('active-desig-filter-tag').classList.add('hidden');
+        document.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active'));
+        if (filterType === 'all') document.getElementById('pill-all').classList.add('active');
+        else if (filterType === 'Active') document.getElementById('pill-active').classList.add('active');
+        else if (filterType === 'On Leave') document.getElementById('pill-leave').classList.add('active');
+        else if (filterType === 'Resigned/Terminated') document.getElementById('pill-resigned').classList.add('active');
+        else if (filterType === 'alerts') document.getElementById('pill-alerts').classList.add('active');
+        renderData();
+    }
+
+    function resetSearchFilter() {
+        currentPillFilter = 'all';
+        window.activeDesignationFilter = null;
+        window.selectedNationalityFilter = 'ALL';
+        document.getElementById('nationality-filter-select').value = 'ALL';
+        document.getElementById('active-desig-filter-tag').classList.add('hidden');
+        document.getElementById('search-input').value = '';
+        document.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('pill-all').classList.add('active');
+        renderData();
+    }
+
+    function focusNationalityFilter() {
+        const selectElem = document.getElementById('nationality-filter-select');
+        if (selectElem) {
+            selectElem.focus();
+            selectElem.style.borderColor = 'var(--primary)';
+            setTimeout(() => selectElem.style.borderColor = 'var(--line)', 2000);
+        }
+    }
+
+    function handleNationalityFilterChange(val) { window.selectedNationalityFilter = val; renderData(); }
+
+    window.updateNationalityDropdownOptions = function () {
+        const selectElem = document.getElementById('nationality-filter-select');
+        if (!selectElem) return;
+        const nats = new Set();
+        (window.employees || []).forEach(e => { if (e.nationality && e.nationality.trim()) nats.add(e.nationality.trim()); });
+        let html = '<option value="ALL">🌍 All Nationalities</option>';
+        Array.from(nats).sort().forEach(nat => {
+            const count = (window.employees || []).filter(e => e.nationality === nat).length;
+            html += `<option value="${escapeHtml(nat)}">${escapeHtml(nat)} (${count})</option>`;
+        });
+        selectElem.innerHTML = html;
+        selectElem.value = window.selectedNationalityFilter || 'ALL';
+    };
+
+    function getFilteredEmployees() {
+        const searchVal = document.getElementById('search-input') ? document.getElementById('search-input').value.trim().toLowerCase() : '';
+        let list = (window.employees || []).filter(emp => {
+            if (window.selectedAccountFilter && window.selectedAccountFilter !== 'ALL') {
+                if (emp.creatorEmail !== window.selectedAccountFilter) return false;
+            }
+            if (window.selectedNationalityFilter && window.selectedNationalityFilter !== 'ALL') {
+                if (String(emp.nationality).trim().toLowerCase() !== window.selectedNationalityFilter.trim().toLowerCase()) return false;
+            }
+            if (currentPillFilter === 'alerts') {
+                const iqStatus = checkExpiryStatus(emp.iqamaExp);
+                const scfhsStatus = checkExpiryStatus(emp.scfhsExp);
+                if (iqStatus.level === 'valid' && scfhsStatus.level === 'valid') return false;
+            } else if (currentPillFilter !== 'all') {
+                if ((emp.status || 'Active') !== currentPillFilter) return false;
+            }
+            if (window.activeDesignationFilter) {
+                if (String(emp.designation).trim().toLowerCase() !== window.activeDesignationFilter.trim().toLowerCase()) return false;
+            }
+            if (searchVal) {
+                const combinedText = `${emp.id} ${emp.name} ${emp.designation} ${emp.project} ${emp.mobile} ${emp.nationality} ${emp.iqama} ${emp.status} ${emp.creatorEmail} ${emp.projectName}`.toLowerCase();
+                const words = searchVal.split(/\s+/);
+                return words.every(word => combinedText.includes(word));
+            }
+            return true;
+        });
+        const sortMode = document.getElementById('sort-select') ? document.getElementById('sort-select').value : 'id-asc';
+        list.sort((a, b) => {
+            if (sortMode === 'id-asc') return String(a.id).localeCompare(String(b.id), undefined, { numeric: true });
+            if (sortMode === 'id-desc') return String(b.id).localeCompare(String(a.id), undefined, { numeric: true });
+            if (sortMode === 'name-asc') return String(a.name).localeCompare(String(b.name));
+            if (sortMode === 'name-desc') return String(b.name).localeCompare(String(a.name));
+            if (sortMode === 'salary-high') return (b.salary || 0) - (a.salary || 0);
+            if (sortMode === 'salary-low') return (a.salary || 0) - (b.salary || 0);
+            if (sortMode === 'expiry-near') {
+                const getMinDays = (e) => Math.min(checkExpiryStatus(e.iqamaExp).days, checkExpiryStatus(e.scfhsExp).days);
+                return getMinDays(a) - getMinDays(b);
+            }
+            return 0;
+        });
+        return list;
+    }
+
+    window.renderData = function () {
+        const tbody = document.getElementById('employee-table-body');
+        if (!tbody) return;
+        let totalStaff = (window.employees || []).length;
+        let activeStaff = 0, alertCount = 0;
+        let nationalities = new Set();
+        (window.employees || []).forEach(emp => {
+            const status = emp.status || 'Active';
+            if (status === 'Active') activeStaff++;
+            if (emp.nationality) nationalities.add(emp.nationality);
+            const iqStatus = checkExpiryStatus(emp.iqamaExp);
+            const scfhsStatus = checkExpiryStatus(emp.scfhsExp);
+            if (iqStatus.level !== 'valid' || scfhsStatus.level !== 'valid') alertCount++;
+        });
+        document.getElementById('stat-total').innerText = totalStaff;
+        document.getElementById('stat-active').innerText = activeStaff;
+        document.getElementById('stat-nationalities').innerText = nationalities.size;
+        document.getElementById('stat-alerts').innerText = alertCount;
+
+        const filteredList = getFilteredEmployees();
+        if (filteredList.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#94a3b8; font-weight:700;">No matching employees found on Main Server</td></tr>';
+            return;
+        }
+        tbody.innerHTML = filteredList.map(emp => {
+            const status = emp.status || 'Active';
+            let statusBadgeClass = 'badge-green';
+            if (status === 'On Leave') statusBadgeClass = 'badge-warning';
+            if (status === 'Resigned/Terminated') statusBadgeClass = 'badge-critical';
+            const accountLabel = emp.projectName || emp.creatorEmail || 'Main Server';
+            return `
+                <tr>
+                    <td><img src="${escapeHtml(emp.photo)}" class="emp-thumb" onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png'"></td>
+                    <td class="clickable-id" data-action="view" data-id="${emp.firestoreId}" title="Click to view full profile">${escapeHtml(emp.id)}</td>
+                    <td><span class="badge badge-purple">${escapeHtml(accountLabel)}</span></td>
+                    <td><b>${escapeHtml(emp.name)}</b></td>
+                    <td><span class="badge ${statusBadgeClass}">${escapeHtml(status)}</span></td>
+                    <td><b>${escapeHtml(emp.designation)}</b></td>
+                    <td>${escapeHtml(emp.project)}</td>
+                    <td>${escapeHtml(emp.mobile)}</td>
+                    <td>
+                        <button data-action="card" data-id="${emp.firestoreId}" class="btn-sm btn-card">🪪 Card</button>
+                        ${window.isGuestUser ? '' : `
+                        <button data-action="edit" data-id="${emp.firestoreId}" class="btn-sm btn-edit">✏️</button>
+                        <button data-action="delete" data-id="${emp.firestoreId}" class="btn-sm btn-del">🗑️</button>`}
+                    </td>
+                </tr>`;
+        }).join('');
+    };
+
+    function openDesignationModal() { renderDesignationTable(); document.getElementById('desig-modal').style.display = 'flex'; }
+    function closeDesignationModal() { document.getElementById('desig-modal').style.display = 'none'; }
+
+    function filterByDesignation(desig) {
+        window.activeDesignationFilter = desig;
+        document.getElementById('active-desig-filter-name').innerText = desig;
+        document.getElementById('active-desig-filter-tag').classList.remove('hidden');
+        closeDesignationModal();
+        renderData();
+    }
+
+    function clearDesignationFilter() {
+        window.activeDesignationFilter = null;
+        document.getElementById('active-desig-filter-tag').classList.add('hidden');
+        renderData();
+    }
+
+    function renderDesignationTable() {
+        const tbody = document.getElementById('desig-table-body');
+        let counts = {};
+        let total = (window.employees || []).length;
+        (window.employees || []).forEach(emp => { const d = emp.designation || 'Unassigned'; counts[d] = (counts[d] || 0) + 1; });
+        document.getElementById('desig-total-badge').innerText = `Total Employees: ${total}`;
+        document.getElementById('desig-total-cell').innerText = `${total} Employees`;
+        if (total === 0) {
+            tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; color:#94a3b8;">No staff data available</td></tr>';
+            return;
+        }
+        tbody.innerHTML = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).map(desig => `
+            <tr class="clickable-row" data-desig="${escapeHtml(desig)}" title="Click to view all ${escapeHtml(desig)} employees">
+                <td style="font-weight:700; color: var(--primary); text-decoration:underline;">${escapeHtml(desig)} ↗️</td>
+                <td style="font-weight:800; color: var(--ink);">${counts[desig]} Employees</td>
+            </tr>`).join('');
+    }
+
+    function openDetailModal(firestoreId) {
+        const emp = window.employees.find(e => e.firestoreId === firestoreId);
+        if (!emp) return;
+        const iqamaStatus = checkExpiryStatus(emp.iqamaExp);
+        const scfhsStatus = checkExpiryStatus(emp.scfhsExp);
+        document.getElementById('pop-photo').src = emp.photo;
+        document.getElementById('pop-name').innerText = emp.name;
+        document.getElementById('pop-desig').innerText = emp.designation;
+        document.getElementById('pop-id').innerText = "ID: " + emp.id;
+        const status = emp.status || 'Active';
+        document.getElementById('pop-status-badge').innerText = status;
+        document.getElementById('pop-status-badge').className = `badge ${status === 'Active' ? 'badge-green' : status === 'On Leave' ? 'badge-warning' : 'badge-critical'}`;
+        document.getElementById('pop-account-owner').innerText = `${emp.projectName || 'Account'} (${emp.creatorEmail || 'N/A'})`;
+        document.getElementById('pop-nat').innerText = emp.nationality || 'N/A';
+        document.getElementById('pop-project').innerText = emp.project || 'N/A';
+        document.getElementById('pop-mobile').innerText = emp.mobile || 'N/A';
+        document.getElementById('pop-salary').innerText = `${emp.salary || 0} SAR (${emp.bank || 'N/A'})`;
+        document.getElementById('pop-start-date').innerText = emp.startDate || 'N/A';
+        document.getElementById('pop-last-date').innerText = emp.lastDate || 'N/A';
+        document.getElementById('pop-reason').innerText = emp.leavingReason || 'N/A';
+        document.getElementById('pop-iqama').innerHTML = `${escapeHtml(emp.iqama || 'N/A')}<br><span class="badge ${iqamaStatus.class}">${escapeHtml(iqamaStatus.badge)}</span>`;
+        document.getElementById('pop-passport').innerText = emp.passport || 'N/A';
+        document.getElementById('pop-scfhs').innerHTML = emp.scfhsExp ? `<span class="badge ${scfhsStatus.class}">${escapeHtml(scfhsStatus.badge)}</span>` : 'N/A';
+        let docsHtml = '';
+        const docFields = [['iqamaPic', 'Iqama'], ['passportPic', 'Passport'], ['scfhsPic', 'SCFHS'], ['baladiyaPic', 'Baladiya'], ['reasonPic', 'Reason Paper']];
+        docFields.forEach(([key, label]) => {
+            if (emp[key]) docsHtml += `<button class="doc-link" data-doc-key="${key}" data-doc-label="${escapeHtml(label + ' Document')}" data-doc-id="${emp.firestoreId}">📄 ${label}</button>`;
+        });
+        if (!docsHtml) docsHtml = '<span style="color:#94a3b8; font-size:12px;">No documents attached</span>';
+        const docsContainer = document.getElementById('pop-docs');
+        docsContainer.innerHTML = docsHtml;
+        docsContainer.querySelectorAll('[data-doc-key]').forEach(btn => {
+            btn.addEventListener('click', () => openDocViewer(btn.dataset.docId, btn.dataset.docKey, btn.dataset.docLabel));
+        });
+        document.getElementById('detail-modal').style.display = 'flex';
+    }
+
+    function closeDetailModal() { document.getElementById('detail-modal').style.display = 'none'; }
+
+    function openDocViewer(firestoreId, fieldKey, title) {
+        const emp = window.employees.find(e => e.firestoreId === firestoreId);
+        if (!emp || !emp[fieldKey]) return showToast(title + ' file not attached!', 'error');
+        const fileData = emp[fieldKey];
+        document.getElementById('doc-title').innerText = `${title} - ${emp.name}`;
+        const imgTarget = document.getElementById('doc-img-target');
+        const iframeTarget = document.getElementById('doc-iframe-target');
+        const openLink = document.getElementById('doc-open-link');
+        if (fileData.startsWith('data:application/pdf') || fileData.toLowerCase().includes('.pdf')) {
+            imgTarget.style.display = 'none';
+            iframeTarget.style.display = 'block';
+            iframeTarget.src = fileData;
+            openLink.style.display = 'inline-flex';
+            openLink.href = fileData;
+        } else {
+            iframeTarget.style.display = 'none';
+            openLink.style.display = 'none';
+            imgTarget.style.display = 'block';
+            imgTarget.src = fileData;
+        }
+        document.getElementById('doc-viewer-modal').style.display = 'flex';
+    }
+
+    function closeDocViewer() {
+        document.getElementById('doc-viewer-modal').style.display = 'none';
+        document.getElementById('doc-iframe-target').src = '';
+    }
+
+    function editEmployee(firestoreId) {
+        const emp = window.employees.find(e => e.firestoreId === firestoreId);
+        if (!emp) return;
+        document.getElementById('edit-doc-id').value = firestoreId;
+        document.getElementById('empId').value = emp.id;
+        document.getElementById('empName').value = emp.name;
+        document.getElementById('empStatus').value = emp.status || 'Active';
+        document.getElementById('project').value = emp.project || '';
+        document.getElementById('mobile').value = emp.mobile || '';
+        document.getElementById('startDate').value = emp.startDate || '';
+        document.getElementById('lastDate').value = emp.lastDate || '';
+        document.getElementById('leavingReason').value = emp.leavingReason || '';
+        document.getElementById('iqama').value = emp.iqama || '';
+        document.getElementById('iqamaExpiry').value = emp.iqamaExp || '';
+        document.getElementById('passport').value = emp.passport || '';
+        document.getElementById('scfhsExpiry').value = emp.scfhsExp || '';
+        document.getElementById('salary').value = emp.salary || '';
+        document.getElementById('bank').value = emp.bank || '';
+        document.getElementById('nationality').value = emp.nationality || '';
+        handleNationalityChange();
+        if (document.getElementById('nationality').value === 'Other') document.getElementById('customNationality').value = emp.nationality;
+        document.getElementById('designation').value = emp.designation || '';
+        handleDesignationChange();
+        if (document.getElementById('designation').value === 'Other') document.getElementById('customDesignation').value = emp.designation;
+        window.currentFiles = {
+            photo: emp.photo || "",
+            iqamaPic: emp.iqamaPic || "",
+            passportPic: emp.passportPic || "",
+            scfhsPic: emp.scfhsPic || "",
+            baladiyaPic: emp.baladiyaPic || "",
+            reasonPic: emp.reasonPic || ""
+        };
+        const fileInputMap = { photo: 'photo', iqamaPic: 'iqamaPicInput', passportPic: 'passportPicInput', scfhsPic: 'scfhsPicInput', baladiyaPic: 'baladiyaPicInput', reasonPic: 'reasonPicInput' };
+        Object.keys(fileInputMap).forEach(key => {
+            const el = document.getElementById(fileInputMap[key]);
+            if (el) el.classList.toggle('file-loaded', !!window.currentFiles[key]);
+        });
+        document.getElementById('form-title').innerText = "✏️ Edit Employee Profile";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openIDCard(firestoreId) {
+        const emp = window.employees.find(e => e.firestoreId === firestoreId);
+        if (!emp) return;
+        document.getElementById('card-org-logo').src = localStorage.getItem('al_majmaah_custom_logo') || document.getElementById('header-logo-preview').src;
+        document.getElementById('card-photo').src = emp.photo;
+        document.getElementById('card-name').innerText = emp.name;
+        document.getElementById('card-desig').innerText = emp.designation;
+        document.getElementById('card-id').innerText = emp.id;
+        document.getElementById('card-iqama').innerText = emp.iqama;
+        document.getElementById('card-mobile').innerText = emp.mobile;
+        document.getElementById('qrcode').innerHTML = "";
+        new QRCode(document.getElementById("qrcode"), { text: `EMP ID: ${emp.id}, Name: ${emp.name}`, width: 70, height: 70 });
+        document.getElementById('id-card-modal').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('id-card-modal').style.display = 'none'; }
+
+    function uploadSystemLogo(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        if (window.isGuestUser) return showToast("👀 Guest access is read-only.", 'error');
+        compressFile(file, 400, 0.85).then(dataUrl => {
+            try {
+                localStorage.setItem('al_majmaah_custom_logo', dataUrl);
+                loadSavedCustomizations();
+            } catch (err) {
+                showToast('Logo too large to save locally. Try a smaller image.', 'error');
+            }
+        }).catch(err => showToast('Could not process logo: ' + err.message, 'error'));
+    }
+
+    function uploadCustomBackground(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        if (window.isGuestUser) return showToast("👀 Guest access is read-only.", 'error');
+        compressFile(file, 1920, 0.75).then(dataUrl => {
+            try {
+                localStorage.setItem('al_majmaah_custom_bg', dataUrl);
+                loadSavedCustomizations();
+            } catch (err) {
+                showToast('Background too large to save locally. Try a smaller image.', 'error');
+            }
+        }).catch(err => showToast('Could not process background: ' + err.message, 'error'));
+    }
+
+    function loadSavedCustomizations() {
+        const savedLogo = localStorage.getItem('al_majmaah_custom_logo') || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+        document.getElementById('login-logo-preview').src = savedLogo;
+        document.getElementById('header-logo-preview').src = savedLogo;
+        const savedBg = localStorage.getItem('al_majmaah_custom_bg');
+        if (savedBg) {
+            document.getElementById('main-body').style.background = `linear-gradient(rgba(79, 70, 229, 0.55), rgba(14, 165, 233, 0.55)), url('${savedBg}')`;
+            document.getElementById('main-body').style.backgroundSize = 'cover';
+            document.getElementById('main-body').style.backgroundPosition = 'center';
+            document.getElementById('main-body').style.backgroundAttachment = 'fixed';
+        }
+    }
+
+    function exportToCSV() {
+        if (!window.employees || window.employees.length === 0) return showToast('No records to export!', 'error');
+        const escCsv = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+        let csv = 'ID,Account Owner,Name,Status,Nationality,Designation,Project,Mobile,Uploaded Date & Time,Start Date,Last Date,Leaving Reason,Iqama,Iqama Expiry,Passport,SCFHS Expiry,Salary,Bank\n';
+        window.employees.forEach(e => {
+            csv += [e.id, e.projectName || e.creatorEmail, e.name, e.status || 'Active', e.nationality, e.designation, e.project, e.mobile, e.uploadedAt || 'N/A', e.startDate, e.lastDate, e.leavingReason, e.iqama, e.iqamaExp, e.passport, e.scfhsExp, e.salary, e.bank].map(escCsv).join(',') + '\n';
+        });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+        a.download = `MainServer_Employees_Export.csv`;
+        a.click();
+    }
+</script>
+</body>
+</html>
