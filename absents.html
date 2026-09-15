@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Absence Register - Afras Company Al Majmaa</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+    --primary:#4f46e5; --primary-light:#6366f1; --primary-dark:#3730a3;
+    --ink:#1e1b2e; --muted:#64748b;
+    --bg-1:#eef1fb; --bg-2:#e3e8fb; --bg-3:#dbe3fb;
+    --surface:rgba(255,255,255,.88); --glass-border:rgba(255,255,255,.7); --line:#e6e8f5;
+    --radius-lg:22px;
+    --green:#059669; --green-bg:#d1fae5; --green-line:#a7f3d0;
+    --amber:#b45309; --amber-bg:#ffedd5; --amber-line:#fed7aa;
+    --red:#be123c;   --red-bg:#ffe4e6;   --red-line:#fda4af;
+    --blue:#0369a1;  --blue-bg:#e0f2fe;  --blue-line:#bae6fd;
+    --violet:#6d28d9;--violet-bg:#f3e8ff;--violet-line:#e9d5ff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+    font-family:'Inter',sans-serif; color:var(--ink); min-height:100vh; padding:16px 16px 60px;
+    perspective:1600px;
+    background:
+        radial-gradient(1200px 500px at 10% -10%, var(--bg-3), transparent),
+        radial-gradient(900px 500px at 100% 0%, var(--bg-2), transparent),
+        var(--bg-1);
+    background-attachment:fixed;
+}
+h1,h2,h3{font-family:'Plus Jakarta Sans',sans-serif}
+.wrap{max-width:1240px;margin:0 auto}
+::-webkit-scrollbar{height:8px;width:8px}
+::-webkit-scrollbar-thumb{background:#c7cdf5;border-radius:10px}
+
+#toast-stack{position:fixed;top:18px;right:18px;z-index:3000;display:flex;flex-direction:column;gap:10px;max-width:340px}
+.toast{
+    background:#fff;border-radius:10px;padding:12px 16px;border-left:4px solid var(--primary);
+    box-shadow:0 16px 40px rgba(79,70,229,.2);font-size:13px;font-weight:600;
+    animation:toastIn .25s ease-out;
+}
+.toast.success{border-left-color:var(--green)}
+.toast.error{border-left-color:var(--red)}
+@keyframes toastIn{from{transform:translateX(24px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+.absent-head{
+    display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+    background:linear-gradient(135deg,#1b1830 0%,#2b2450 45%,#3b2f6e 100%);
+    border-radius:18px;padding:18px 22px;margin-bottom:18px;color:#fff;
+    box-shadow:inset 0 1.5px 0 rgba(255,255,255,.18),inset 0 -3px 0 rgba(0,0,0,.30),
+               0 5px 0 #17142a,0 18px 34px rgba(27,24,48,.45);
+}
+.absent-head h1{font-size:22px;font-weight:900;letter-spacing:.5px;text-shadow:0 2px 6px rgba(0,0,0,.5)}
+.absent-head p{font-size:11.5px;opacity:.72;font-weight:600;margin-top:3px}
+.absent-head .spacer{flex:1}
+.led{
+    font-family:'IBM Plex Mono',ui-monospace,monospace;
+    background:linear-gradient(180deg,#0d0b18,#16122b);
+    border:1px solid rgba(255,255,255,.14);border-radius:13px;
+    padding:9px 16px;text-align:center;min-width:96px;
+    box-shadow:inset 0 3px 10px rgba(0,0,0,.65),0 3px 0 rgba(0,0,0,.35);
+}
+.led .num{font-size:23px;font-weight:700;line-height:1.1;letter-spacing:1px;font-variant-numeric:tabular-nums}
+.led .lbl{font-size:8.5px;text-transform:uppercase;letter-spacing:.14em;opacity:.62;margin-top:3px;font-weight:600}
+.led.cyan .num{color:#4fd1e5;text-shadow:0 0 9px rgba(79,209,229,.65)}
+.led.amber .num{color:#f8c352;text-shadow:0 0 9px rgba(248,195,82,.6)}
+.led.green .num{color:#52e0a4;text-shadow:0 0 9px rgba(82,224,164,.6)}
+
+.card{
+    background:linear-gradient(165deg,rgba(255,255,255,.96),rgba(240,243,255,.92));
+    border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:20px;margin-bottom:16px;
+    box-shadow:inset 0 1.5px 0 rgba(255,255,255,.95),inset 0 -2px 0 rgba(79,70,229,.07),
+               0 3px 0 #dfe3f8,0 12px 26px rgba(79,70,229,.13),0 30px 55px rgba(30,27,46,.08);
+}
+.card h3{font-size:14px;margin-bottom:14px;color:var(--primary-dark);letter-spacing:.3px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:11px;font-weight:700;color:#334155;text-transform:uppercase;letter-spacing:.02em}
+.field .hint{font-size:10px;color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0}
+input{
+    background:#fff;border:1.5px solid var(--line);padding:10px 12px;border-radius:12px;
+    font-size:13px;outline:none;width:100%;font-family:inherit;color:var(--ink);transition:all .15s;
+    box-shadow:inset 0 2px 4px rgba(79,70,229,.07),0 1px 0 rgba(255,255,255,.9);
+}
+input:focus{border-color:var(--primary-light);box-shadow:inset 0 2px 4px rgba(79,70,229,.05),0 0 0 3px rgba(99,102,241,.18),0 6px 14px rgba(79,70,229,.14)}
+input.locked{background:#f1f3fc;color:var(--primary-dark);font-weight:700;cursor:not-allowed}
+.lookup-ok{border-color:var(--green)!important;background:#f0fdf7!important}
+.lookup-bad{border-color:var(--red)!important;background:#fff5f6!important}
+.date-wrap{position:relative;display:flex;align-items:center}
+.date-wrap input[type=text]{padding-right:35px}
+.date-icon{position:absolute;right:10px;font-size:15px;opacity:.65;pointer-events:none}
+.date-hidden{position:absolute;right:0;opacity:0;width:32px;height:32px;cursor:pointer;z-index:5}
+.days-chip{
+    font-family:'IBM Plex Mono',ui-monospace,monospace;
+    background:linear-gradient(180deg,#0d0b18,#16122b);color:#f8c352;
+    border-radius:12px;padding:10px 12px;text-align:center;font-size:19px;font-weight:700;
+    border:1px solid rgba(255,255,255,.12);letter-spacing:1px;
+    box-shadow:inset 0 3px 9px rgba(0,0,0,.6);font-variant-numeric:tabular-nums;
+}
+button{font-family:inherit;cursor:pointer;border:none}
+.btn{
+    color:#fff;padding:11px 18px;border-radius:13px;font-weight:700;font-size:13px;
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    background:linear-gradient(135deg,var(--primary-light),var(--primary));
+    box-shadow:inset 0 1.5px 0 rgba(255,255,255,.45),inset 0 -2.5px 0 rgba(0,0,0,.18),
+               0 4px 0 rgba(55,48,163,.55),0 10px 18px rgba(79,70,229,.30);
+    text-shadow:0 1px 2px rgba(0,0,0,.22);transition:all .18s;
+}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(3px);box-shadow:inset 0 2px 5px rgba(0,0,0,.28)}
+.btn-green{background:linear-gradient(135deg,#10b981,var(--green));box-shadow:inset 0 1.5px 0 rgba(255,255,255,.42),inset 0 -2.5px 0 rgba(0,0,0,.18),0 4px 0 #046c4e,0 10px 18px rgba(5,150,105,.30)}
+.btn-grey{background:#64748b;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.35),inset 0 -2.5px 0 rgba(0,0,0,.18),0 4px 0 #45505f,0 10px 18px rgba(100,116,139,.28)}
+.btn-amber{background:linear-gradient(135deg,#fbbf24,#d97706);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.42),inset 0 -2.5px 0 rgba(0,0,0,.18),0 4px 0 #9a5b04,0 10px 18px rgba(217,119,6,.30)}
+.btn-sm{
+    padding:6px 11px;border-radius:9px;font-size:11px;font-weight:700;margin:2px;
+    display:inline-flex;align-items:center;gap:4px;
+    box-shadow:inset 0 1.5px 0 rgba(255,255,255,.8),0 2.5px 0 rgba(30,27,46,.13),0 5px 10px rgba(30,27,46,.12);
+}
+.btn-sm:active{transform:translateY(2px)}
+.btn-edit{background:var(--amber-bg);color:var(--amber)}
+.btn-del{background:var(--red-bg);color:var(--red)}
+
+.month-strip{display:flex;gap:9px;overflow-x:auto;padding:2px 2px 10px;margin-bottom:14px}
+.month-chip{
+    flex:none;cursor:pointer;border-radius:14px;padding:9px 15px;min-width:116px;
+    border:1.5px solid var(--line);background:linear-gradient(165deg,#fff,#eff1fd);
+    box-shadow:inset 0 1.5px 0 rgba(255,255,255,.95),0 2.5px 0 #dfe3f8,0 7px 14px rgba(79,70,229,.12);
+    transition:transform .18s;
+}
+.month-chip:hover{transform:translateY(-2px)}
+.month-chip .m-name{font-size:11.5px;font-weight:800;color:var(--primary-dark)}
+.month-chip .m-val{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:16px;font-weight:700;color:var(--violet);margin-top:2px;font-variant-numeric:tabular-nums}
+.month-chip .m-sub{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.month-chip.active{
+    background:linear-gradient(135deg,var(--primary-light),var(--primary));border-color:transparent;
+    box-shadow:inset 0 1.5px 0 rgba(255,255,255,.4),inset 0 -2px 0 rgba(0,0,0,.16),0 4px 0 rgba(55,48,163,.5),0 10px 18px rgba(79,70,229,.28);
+}
+.month-chip.active .m-name,.month-chip.active .m-val,.month-chip.active .m-sub{color:#fff}
+
+.table-box{
+    overflow:auto;max-height:56vh;border-radius:16px;border:1px solid var(--line);background:#fff;
+    box-shadow:inset 0 2px 5px rgba(79,70,229,.07),0 3px 0 #e4e7fa,0 12px 24px rgba(30,27,46,.09);
+}
+table{width:100%;border-collapse:collapse;font-size:13px;text-align:left;min-width:940px}
+th{
+    background:linear-gradient(180deg,#f6f7ff,#e7eafb);padding:12px 10px;color:var(--primary-dark);
+    font-weight:800;font-size:11px;text-transform:uppercase;letter-spacing:.03em;
+    position:sticky;top:0;z-index:5;text-shadow:0 1px 0 rgba(255,255,255,.85);
+    box-shadow:0 2px 0 var(--line),0 5px 9px rgba(79,70,229,.10);
+}
+td{padding:10px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+tbody tr:hover{background:#f7f8ff}
+td.mono{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-weight:600}
+.sr-cell{font-family:'IBM Plex Mono',ui-monospace,monospace;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.badge{display:inline-block;padding:4px 9px;border-radius:7px;font-size:10px;font-weight:800;box-shadow:inset 0 1px 0 rgba(255,255,255,.75),0 2px 4px rgba(30,27,46,.12)}
+.badge-warning{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-line)}
+.badge-blue{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-line)}
+.days-badge{
+    font-family:'IBM Plex Mono',ui-monospace,monospace;font-weight:700;font-variant-numeric:tabular-nums;
+    display:inline-block;padding:4px 11px;border-radius:8px;font-size:12.5px;
+    background:linear-gradient(180deg,#16122b,#241d45);color:#f8c352;
+    box-shadow:inset 0 2px 5px rgba(0,0,0,.55);
+}
+.days-badge.ongoing{color:#4fd1e5}
+tfoot td{background:linear-gradient(180deg,#f6f7ff,#e7eafb);font-weight:900;color:var(--ink);border-top:2px solid var(--line);position:sticky;bottom:0}
+.empty{border:1.5px dashed var(--line);border-radius:14px;padding:32px;text-align:center;color:var(--muted);font-size:13px;font-weight:600}
+.hidden{display:none!important}
+.gate{max-width:460px;margin:16vh auto;text-align:center}
+@media(max-width:640px){
+    .absent-head{padding:14px;gap:10px}
+    .absent-head h1{font-size:17px}
+    .led{min-width:78px;padding:7px 11px}
+    .led .num{font-size:18px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div id="toast-stack"></div>
+
+<div class="wrap">
+
+  <div id="gate" class="card gate hidden">
+    <h3>🔒 Please sign in first</h3>
+    <p style="font-size:13px;color:var(--muted);font-weight:600;margin-bottom:16px;">
+      Open the HR Portal, log in, then press the Absents button there.
+    </p>
+    <a href="index.html" class="btn" style="text-decoration:none;">↩️ Go to HR Portal</a>
+  </div>
+
+  <div id="main" class="hidden">
+
+    <div class="absent-head">
+      <div>
+        <h1>📋 ABSENCE REGISTER</h1>
+        <p>Afras Company Al Majmaa — monthly attendance record</p>
+      </div>
+      <div class="spacer"></div>
+      <div class="led cyan"><div class="num" id="led-records">0</div><div class="lbl">Records</div></div>
+      <div class="led amber"><div class="num" id="led-days">0</div><div class="lbl">Absent Days</div></div>
+      <div class="led green"><div class="num" id="led-staff">0</div><div class="lbl">Employees</div></div>
+    </div>
+
+    <div class="card" id="form-card">
+      <h3 id="form-title">➕ Record a new absence</h3>
+      <form id="absent-form" autocomplete="off">
+        <input type="hidden" id="edit-id" value="">
+        <div class="form-grid">
+          <div class="field">
+            <label>Employee ID *</label>
+            <input type="text" id="ab-id" placeholder="Type ID, name fills in" required>
+          </div>
+          <div class="field">
+            <label>Name (auto)</label>
+            <input type="text" id="ab-name" class="locked" placeholder="—" readonly tabindex="-1">
+          </div>
+          <div class="field">
+            <label>Mobile Num <span class="hint">— editable</span></label>
+            <input type="text" id="ab-mobile" placeholder="Type if not on file">
+          </div>
+          <div class="field">
+            <label>Absent Date *</label>
+            <div class="date-wrap">
+              <input type="text" id="ab-absent" placeholder="YYYY-MM-DD">
+              <span class="date-icon">📅</span>
+              <input type="date" class="date-hidden" data-sync="ab-absent">
+            </div>
+          </div>
+          <div class="field">
+            <label>Return to Work Date</label>
+            <div class="date-wrap">
+              <input type="text" id="ab-return" placeholder="Blank = still absent">
+              <span class="date-icon">📅</span>
+              <input type="date" class="date-hidden" data-sync="ab-return">
+            </div>
+          </div>
+          <div class="field">
+            <label>Absent Days (auto)</label>
+            <div class="days-chip" id="days-preview">0</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
+          <button type="submit" id="save-btn" class="btn btn-green" style="flex:1;min-width:220px;">💾 Save to Register</button>
+          <button type="button" id="clear-btn" class="btn btn-grey">↺ Clear</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="month-strip" id="month-strip"></div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
+      <h3 style="font-size:14px;color:var(--primary-dark);" id="table-heading">🗂️ All months</h3>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <input type="text" id="search" placeholder="🔍 Search ID or name..." style="width:auto;min-width:200px;">
+        <button type="button" id="csv-btn" class="btn btn-amber" style="padding:9px 14px;font-size:11px;">📥 Export CSV</button>
+        <a href="index.html" class="btn btn-grey" style="padding:9px 14px;font-size:11px;text-decoration:none;">↩️ HR Portal</a>
+      </div>
+    </div>
+
+    <div class="table-box">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:52px;">Sr #</th><th>ID Num</th><th>Name</th>
+            <th>Absent Date</th><th>Return to Work</th><th>Mobile Num</th>
+            <th>Absent Days</th><th style="width:96px;">Edit</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="6" style="text-align:right;">TOTAL ABSENT DAYS</td>
+            <td id="total-cell" class="mono">0</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc }
+    from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyC33ueoEDhQ-5vGw56KqBWXb1T6TUqBOzc",
+    authDomain: "al-majmaa-hr.firebaseapp.com",
+    projectId: "al-majmaa-hr",
+    storageBucket: "al-majmaa-hr.firebasestorage.app",
+    messagingSenderId: "584095323914",
+    appId: "1:584095323914:web:4902dbe1f0c8792ef50cf3",
+    measurementId: "G-MHYJFRNMZ8"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* ---------- state ---------- */
+let employees = [];
+let absents = [];
+let filterMonth = 'ALL';
+let isGuest = false;
+
+const $ = id => document.getElementById(id);
+const norm = v => String(v || '').trim().toLowerCase();
+const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+function toast(msg, type) {
+    const el = document.createElement('div');
+    el.className = 'toast' + (type ? ' ' + type : '');
+    el.textContent = msg;
+    $('toast-stack').appendChild(el);
+    setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(() => el.remove(), 300); }, 3600);
+}
+function nowStamp() {
+    return new Date().toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true });
+}
+
+/* ---------- session gate: reuses the portal's own login flags ---------- */
+const adminSession = localStorage.getItem('al_majmaa_admin_session') === 'true';
+const guestSession = localStorage.getItem('al_majmaa_guest_session') === 'true';
+const tenantSession = !!localStorage.getItem('firebase:authUser:' + firebaseConfig.apiKey + ':[DEFAULT]');
+
+if (!adminSession && !guestSession && !tenantSession) {
+    $('gate').classList.remove('hidden');
+} else {
+    isGuest = guestSession;
+    $('main').classList.remove('hidden');
+    if (isGuest) $('form-card').classList.add('hidden');
+    startListeners();
+}
+
+function startListeners() {
+    onSnapshot(collection(db, "employees_v2"), snap => {
+        employees = [];
+        snap.forEach(d => employees.push({ firestoreId: d.id, ...d.data() }));
+        if ($('ab-id').value.trim()) lookupById();
+    }, err => toast('⚠️ Employee sync error: ' + err.message, 'error'));
+
+    onSnapshot(collection(db, "absents_v1"), snap => {
+        absents = [];
+        snap.forEach(d => absents.push({ absentId: d.id, ...d.data() }));
+        render();
+    }, err => toast('⚠️ Absence sync error: ' + err.message, 'error'));
+}
+
+/* ---------- date helpers ---------- */
+function todayMidnight() { const d = new Date(); d.setHours(0,0,0,0); return d; }
+function fmtDate(v) {
+    if (!v) return '';
+    v = String(v).trim();
+    if (v.includes('/')) {
+        const p = v.split('/');
+        if (p.length === 3) return p[0].length === 4
+            ? `${p[0]}-${p[1].padStart(2,'0')}-${p[2].padStart(2,'0')}`
+            : `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
+    }
+    return v;
+}
+function monthKey(d) { return d ? String(d).slice(0,7) : ''; }
+function monthLabel(k) {
+    if (!k) return 'No date';
+    const [y,m] = k.split('-');
+    return new Date(Number(y), Number(m)-1, 1).toLocaleDateString('en-GB', { month:'short', year:'numeric' });
+}
+// Absent days run from the absent date up to (not including) the return day.
+// No return date means still absent, so the count runs to today and grows daily.
+function daysOf(absentDate, returnDate) {
+    if (!absentDate) return { days:0, ongoing:false, valid:false };
+    const start = new Date(absentDate + "T00:00:00");
+    if (isNaN(start.getTime())) return { days:0, ongoing:false, valid:false };
+    if (!returnDate) {
+        const n = Math.floor((todayMidnight() - start) / 86400000) + 1;
+        return { days: Math.max(n,1), ongoing:true, valid:true };
+    }
+    const end = new Date(returnDate + "T00:00:00");
+    if (isNaN(end.getTime())) return { days:0, ongoing:false, valid:false };
+    const n = Math.round((end - start) / 86400000);
+    return { days:n, ongoing:false, valid: n > 0 };
+}
+
+/* ---------- form ---------- */
+function updatePreview() {
+    const r = daysOf(fmtDate($('ab-absent').value), fmtDate($('ab-return').value));
+    const el = $('days-preview');
+    if (!$('ab-absent').value.trim()) { el.textContent = '0'; el.style.color = '#f8c352'; return; }
+    if (!r.valid) { el.textContent = '!'; el.style.color = '#ff7a8a'; return; }
+    el.textContent = r.days + (r.ongoing ? '*' : '');
+    el.style.color = r.ongoing ? '#4fd1e5' : '#f8c352';
+}
+
+// The ID pulls the name from the directory. Mobile is pre-filled the same way
+// but stays editable, so a missing or changed number can be typed by hand.
+function lookupById() {
+    const input = $('ab-id');
+    const raw = input.value.trim();
+    input.classList.remove('lookup-ok','lookup-bad');
+    if (!raw) { $('ab-name').value = ''; return null; }
+    const emp = employees.find(e => norm(e.id) === norm(raw));
+    if (emp) {
+        $('ab-name').value = emp.name || '';
+        const mob = $('ab-mobile');
+        const onFile = (emp.mobile && emp.mobile !== 'N/A') ? emp.mobile : '';
+        if (!mob.value.trim() || mob.dataset.autofilled === '1') {
+            mob.value = onFile;
+            mob.dataset.autofilled = '1';
+        }
+        input.classList.add('lookup-ok');
+        return emp;
+    }
+    $('ab-name').value = '';
+    input.classList.add('lookup-bad');
+    return null;
+}
+
+$('ab-mobile').addEventListener('input', () => { $('ab-mobile').dataset.autofilled = '0'; });
+
+async function submitForm(e) {
+    e.preventDefault();
+    if (isGuest) return toast('👀 Guest access is read-only.', 'error');
+
+    const editId = $('edit-id').value;
+    const idVal = $('ab-id').value.trim();
+    const absentDate = fmtDate($('ab-absent').value);
+    const returnDate = fmtDate($('ab-return').value);
+    const mobileVal = $('ab-mobile').value.trim();
+
+    if (!idVal) return toast('⚠️ Please enter the Employee ID first.', 'error');
+    const emp = employees.find(x => norm(x.id) === norm(idVal));
+    if (!emp) return toast(`⚠️ No employee found with ID (${idVal}).`, 'error');
+    if (!absentDate) return toast('⚠️ Please enter the absent date.', 'error');
+
+    const r = daysOf(absentDate, returnDate);
+    if (!r.valid) return toast('⚠️ Return date must be later than the absent date.', 'error');
+
+    const others = absents.filter(a => a.absentId !== editId);
+    const thisMonth = monthKey(absentDate);
+
+    // One entry per employee per month. Two employees sharing the same date is
+    // fine — only a repeated ID or name inside the same month is blocked.
+    const dupId = others.find(a => norm(a.empId) === norm(idVal) && (a.month || monthKey(a.absentDate)) === thisMonth);
+    if (dupId) return toast(`⚠️ ID (${idVal}) is already in the ${monthLabel(thisMonth)} register. Use Edit on that row instead.`, 'error');
+
+    const dupName = others.find(a => norm(a.name) === norm(emp.name) && (a.month || monthKey(a.absentDate)) === thisMonth);
+    if (dupName) return toast(`⚠️ "${emp.name}" is already in the ${monthLabel(thisMonth)} register (ID ${dupName.empId}).`, 'error');
+
+    const existing = absents.find(a => a.absentId === editId);
+    const payload = {
+        empId: emp.id,
+        name: emp.name || '',
+        mobile: mobileVal || 'N/A',
+        absentDate, returnDate: returnDate || '',
+        days: r.days, ongoing: r.ongoing, month: thisMonth,
+        createdAt: existing ? (existing.createdAt || nowStamp()) : nowStamp(),
+        updatedAt: nowStamp()
+    };
+
+    const btn = $('save-btn');
+    btn.disabled = true; btn.style.opacity = '.7';
+    try {
+        if (editId) { await updateDoc(doc(db, "absents_v1", editId), payload); toast('✅ Record updated.', 'success'); }
+        else        { await addDoc(collection(db, "absents_v1"), payload);     toast('✅ Saved to the register.', 'success'); }
+        resetForm();
+    } catch (err) {
+        toast('❌ Could not save: ' + err.message, 'error');
+    } finally {
+        btn.disabled = false; btn.style.opacity = '1';
+    }
+}
+
+function resetForm() {
+    $('absent-form').reset();
+    $('edit-id').value = '';
+    $('ab-name').value = '';
+    $('ab-mobile').dataset.autofilled = '1';
+    $('ab-id').classList.remove('lookup-ok','lookup-bad');
+    $('form-title').textContent = '➕ Record a new absence';
+    $('save-btn').textContent = '💾 Save to Register';
+    updatePreview();
+}
+
+// Saved rows are read-only in the table; Edit is the only way back in.
+function loadIntoForm(absentId) {
+    if (isGuest) return toast('👀 Guest access is read-only.', 'error');
+    const a = absents.find(x => x.absentId === absentId);
+    if (!a) return;
+    $('edit-id').value = absentId;
+    $('ab-id').value = a.empId || '';
+    $('ab-mobile').dataset.autofilled = '0';
+    $('ab-mobile').value = (a.mobile && a.mobile !== 'N/A') ? a.mobile : '';
+    lookupById();
+    if (!$('ab-name').value) $('ab-name').value = a.name || '';
+    $('ab-absent').value = a.absentDate || '';
+    $('ab-return').value = a.returnDate || '';
+    updatePreview();
+    $('form-title').textContent = '✏️ Edit absence record';
+    $('save-btn').textContent = '💾 Save changes';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function removeRecord(absentId) {
+    if (isGuest) return toast('👀 Guest access is read-only.', 'error');
+    if (!confirm('Delete this absence record permanently?')) return;
+    try { await deleteDoc(doc(db, "absents_v1", absentId)); toast('🗑️ Record deleted.', 'success'); }
+    catch (e) { toast('❌ ' + e.message, 'error'); }
+}
+
+/* ---------- render ---------- */
+function visibleRows() {
+    const q = norm($('search').value);
+    let rows = absents.slice();
+    if (filterMonth !== 'ALL') rows = rows.filter(a => (a.month || monthKey(a.absentDate)) === filterMonth);
+    if (q) rows = rows.filter(a => `${a.empId} ${a.name} ${a.mobile}`.toLowerCase().includes(q));
+    rows.sort((a,b) => String(b.absentDate).localeCompare(String(a.absentDate)));
+    return rows;
+}
+
+function render() {
+    // Recount live so an ongoing absence grows on its own each day.
+    absents.forEach(a => {
+        const r = daysOf(a.absentDate, a.returnDate);
+        a._days = r.valid ? r.days : (a.days || 0);
+        a._ongoing = r.ongoing;
+    });
+
+    const byMonth = {};
+    absents.forEach(a => {
+        const k = a.month || monthKey(a.absentDate);
+        if (!k) return;
+        if (!byMonth[k]) byMonth[k] = { count:0, days:0 };
+        byMonth[k].count++; byMonth[k].days += a._days;
+    });
+    const months = Object.keys(byMonth).sort().reverse();
+    const allDays = absents.reduce((s,a) => s + a._days, 0);
+
+    $('month-strip').innerHTML =
+        `<div class="month-chip ${filterMonth==='ALL'?'active':''}" data-month="ALL">
+            <div class="m-name">All months</div><div class="m-val">${allDays}</div>
+            <div class="m-sub">${absents.length} records</div></div>` +
+        months.map(k => `<div class="month-chip ${filterMonth===k?'active':''}" data-month="${k}">
+            <div class="m-name">${monthLabel(k)}</div><div class="m-val">${byMonth[k].days}</div>
+            <div class="m-sub">${byMonth[k].count} records</div></div>`).join('');
+
+    const rows = visibleRows();
+    const shown = rows.reduce((s,a) => s + a._days, 0);
+    $('led-records').textContent = rows.length;
+    $('led-days').textContent = shown;
+    $('led-staff').textContent = new Set(rows.map(a => norm(a.empId))).size;
+    $('total-cell').textContent = shown + ' days';
+    $('table-heading').textContent = filterMonth === 'ALL' ? '🗂️ All months' : '🗂️ ' + monthLabel(filterMonth);
+
+    if (!rows.length) {
+        $('tbody').innerHTML = '<tr><td colspan="8"><div class="empty">No absence records here yet.</div></td></tr>';
+        return;
+    }
+    $('tbody').innerHTML = rows.map((a,i) => `
+        <tr>
+            <td class="sr-cell">${String(i+1).padStart(2,'0')}</td>
+            <td class="mono"><b>${esc(a.empId)}</b></td>
+            <td><b>${esc(a.name || '-')}</b></td>
+            <td class="mono">${esc(a.absentDate || '-')}</td>
+            <td class="mono">${a.returnDate ? esc(a.returnDate) : '<span class="badge badge-warning">Still absent</span>'}</td>
+            <td class="mono">${a.mobile && a.mobile !== 'N/A' ? esc(a.mobile) : '<span class="badge badge-blue">Not available</span>'}</td>
+            <td><span class="days-badge ${a._ongoing ? 'ongoing' : ''}">${a._days}${a._ongoing ? ' *' : ''}</span></td>
+            <td>${isGuest ? '<span style="color:#94a3b8;font-size:11px;">Locked</span>' : `
+                <button class="btn-sm btn-edit" data-act="edit" data-id="${a.absentId}" title="Edit">✏️</button>
+                <button class="btn-sm btn-del" data-act="del" data-id="${a.absentId}" title="Delete">🗑️</button>`}</td>
+        </tr>`).join('');
+}
+
+function exportCSV() {
+    const rows = visibleRows();
+    if (!rows.length) return toast('No absence records to export!', 'error');
+    const q = v => `"${String(v ?? '').replace(/"/g,'""')}"`;
+    let csv = 'Sr,ID Num,Name,Absent Date,Return to Work,Mobile Num,Absent Days,Month\n';
+    rows.forEach((a,i) => {
+        csv += [i+1, a.empId, a.name, a.absentDate, a.returnDate || 'Still absent',
+                a.mobile, a._days, monthLabel(a.month || monthKey(a.absentDate))].map(q).join(',') + '\n';
+    });
+    csv += `"","","","","","TOTAL","${rows.reduce((s,a)=>s+a._days,0)}",""\n`;
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(new Blob([csv], { type:'text/csv' }));
+    link.download = `Absence_Register_${filterMonth === 'ALL' ? 'All' : filterMonth}.csv`;
+    link.click();
+}
+
+/* ---------- wiring ---------- */
+$('absent-form').addEventListener('submit', submitForm);
+$('clear-btn').addEventListener('click', resetForm);
+$('ab-id').addEventListener('input', lookupById);
+$('ab-absent').addEventListener('input', updatePreview);
+$('ab-return').addEventListener('input', updatePreview);
+$('search').addEventListener('keyup', render);
+$('csv-btn').addEventListener('click', exportCSV);
+document.querySelectorAll('.date-hidden').forEach(inp => {
+    inp.addEventListener('change', () => { $(inp.dataset.sync).value = inp.value; updatePreview(); });
+});
+$('month-strip').addEventListener('click', e => {
+    const chip = e.target.closest('[data-month]');
+    if (!chip) return;
+    filterMonth = chip.dataset.month;
+    render();
+});
+$('tbody').addEventListener('click', e => {
+    const t = e.target.closest('[data-act]');
+    if (!t) return;
+    if (t.dataset.act === 'edit') loadIntoForm(t.dataset.id);
+    else removeRecord(t.dataset.id);
+});
+// Keeps ongoing absences counting up if the tab is left open all day.
+setInterval(render, 60000);
+</script>
+</body>
+</html>
